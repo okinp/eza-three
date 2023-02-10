@@ -74,17 +74,17 @@ function init() {
 
 
   // ===== 💡 LIGHTS =====
-    ambientLight = new AmbientLight('white', 0.4)
-    pointLight = new PointLight('#ffdca8', 1.2, 100)
-    pointLight.position.set(-2, 3, 3)
-    pointLight.castShadow = true
-    pointLight.shadow.radius = 4
-    pointLight.shadow.camera.near = 0.5
-    pointLight.shadow.camera.far = 4000
-    pointLight.shadow.mapSize.width = 2048
-    pointLight.shadow.mapSize.height = 2048
-    scene.add(ambientLight)
-    scene.add(pointLight)
+  ambientLight = new AmbientLight('white', 0.4)
+  pointLight = new PointLight('#ffdca8', 1.2, 100)
+  pointLight.position.set(-2, 3, 3)
+  pointLight.castShadow = true
+  pointLight.shadow.radius = 4
+  pointLight.shadow.camera.near = 0.5
+  pointLight.shadow.camera.far = 4000
+  pointLight.shadow.mapSize.width = 2048
+  pointLight.shadow.mapSize.height = 2048
+  scene.add(ambientLight)
+  scene.add(pointLight)
 
   interface LoadedType {
     loaded: Number;
@@ -113,26 +113,31 @@ function init() {
   const modelLoader = new GLTFLoader();
 
 
-  Promise.all([ createTexturesAndMaterials(), modelLoader.loadAsync('/glb/Botella.glb')])
-    .then(([ { materials }, gltf]) => {
+  Promise.all([createTexturesAndMaterials(), modelLoader.loadAsync('/glb/lager.glb')])
+    .then(([{ materials }, gltf]) => {
+      console.log(gltf);
       const container = new Object3D();
       const model = gltf.scene.children[0];
-      model.traverse( object => {
+      model.traverse(object => {
         if (object.type !== 'Mesh') return;
-        switch(object.name){
-          case 'Botella_01':
+        switch (object.name) {
+          case 'bottle':
             (object as Mesh).material = materials.bottleMaterial;
+            object.renderOrder = 0
+            break;
+          case 'bottle-inner':
+            (object as Mesh).material = materials.bottleInnerMaterial;
             object.renderOrder = 1
             break;
-          case 'Etiqueta_01':
-          case 'Etiqueta_02':
+          case 'label-front':
             (object as Mesh).material = materials.labelFrontMaterial
+            object.renderOrder = 3
+            break;
+          case 'label-back':
+            (object as Mesh).material = materials.labelBackMaterial
             object.renderOrder = 2
             break;
-          case 'EtiquetaBack':
-            (object as Mesh).material = materials.labelBackMaterial
-            break;
-          case 'Tapa':
+          case 'cap':
             (object as Mesh).material = materials.capMaterial
             object.renderOrder = 2
             break;
