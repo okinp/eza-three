@@ -52,14 +52,14 @@ export const createTexturesAndMaterials = async () => {
         color: 0x7cb02a,
         metalness: 0.2,
         roughness: 0.12,
-        envMapIntensity: 1.25,
-        // opacity: 1,
-        // transparent: true,
+        envMapIntensity: 0,
+        opacity: 1,
+        transparent: false,
         transmission: 1,
         clearcoat: 0.5,
         clearcoatRoughness: 0.3,
         specularColor: new Color(0x2e4633),
-        thickness: 50,
+        thickness: 500,
     })
 
 

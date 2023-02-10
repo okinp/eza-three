@@ -113,37 +113,50 @@ function init() {
   const modelLoader = new GLTFLoader();
 
 
-  Promise.all([createTexturesAndMaterials(), modelLoader.loadAsync('/glb/lager.glb')])
-    .then(([{ materials }, gltf]) => {
+  Promise.all([createTexturesAndMaterials(), modelLoader.loadAsync('/glb/untitled.glb')])
+    .then(([{  }, gltf]) => {
       console.log(gltf);
       const container = new Object3D();
-      const model = gltf.scene.children[0];
-      model.traverse(object => {
-        if (object.type !== 'Mesh') return;
-        switch (object.name) {
-          case 'bottle':
-            (object as Mesh).material = materials.bottleMaterial;
-            object.renderOrder = 0
-            break;
-          case 'bottle-inner':
-            (object as Mesh).material = materials.bottleInnerMaterial;
-            object.renderOrder = 1
-            break;
-          case 'label-front':
-            (object as Mesh).material = materials.labelFrontMaterial
-            object.renderOrder = 3
-            break;
-          case 'label-back':
-            (object as Mesh).material = materials.labelBackMaterial
-            object.renderOrder = 2
-            break;
-          case 'cap':
-            (object as Mesh).material = materials.capMaterial
-            object.renderOrder = 2
-            break;
-        }
-      })
-      container.add(model);
+      // const model = gltf.scene.children;
+      const bottleMesh = gltf.scene.children[0];
+      const capMesh = gltf.scene.children[1];
+      const labelTopMesh = gltf.scene.children[2];
+      const bottleInnerMesh = gltf.scene.children[3];
+      const labelFrontMesh = gltf.scene.children[4];
+      const labelBackMesh = gltf.scene.children[5];
+
+      // model.traverse(object => {
+      //   if (object.type !== 'Mesh') return;
+      //   switch (object.name) {
+      //     case 'bottle':
+      //       (object as Mesh).material = materials.bottleMaterial;
+      //       object.renderOrder = 0
+      //       break;
+      //     case 'bottle-inner':
+      //       (object as Mesh).material = materials.bottleInnerMaterial;
+      //       object.renderOrder = 1
+      //       break;
+      //     case 'label-front':
+      //       (object as Mesh).material = materials.labelFrontMaterial
+      //       object.renderOrder = 3
+      //       break;
+      //     case 'label-back':
+      //       (object as Mesh).material = materials.labelBackMaterial
+      //       object.renderOrder = 2
+      //       break;
+      //     // case 'cap':
+      //     //   (object as Mesh).material = materials.capMaterial
+      //     //   object.renderOrder = 2
+      //     //   break;
+      //   }
+      // })
+      container.add(bottleMesh);
+      container.add(capMesh);
+      container.add(labelTopMesh);
+      container.add(bottleInnerMesh);
+      container.add(labelFrontMesh);
+      container.add(labelBackMesh);
+
       scene.add(container)
     })
 
