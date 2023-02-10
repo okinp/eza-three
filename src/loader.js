@@ -1,18 +1,13 @@
 import {
-    Texture,
-    TextureEncoding,
     TextureLoader
 } from "three";
 
-interface ITextureParams {
-    url: string,
-    encoding: TextureEncoding;
-}
 
-export async function loadTextures(textureParams: ITextureParams[]) {
+
+export async function loadTextures(textureParams) {
 
     const textureLoader = new TextureLoader();
-    const textureStore = new Map<string, Texture>();
+    const textureStore = new Map();
     const textures = await Promise.all(textureParams.map(({ url }) => textureLoader.loadAsync(url)));
 
     textures.forEach((tex, idx) => {

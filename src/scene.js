@@ -41,20 +41,20 @@ import './style.css'
 
 const CANVAS_ID = 'scene'
 
-let canvas: HTMLElement
-let renderer: WebGLRenderer
-let scene: Scene
-let ambientLight: AmbientLight
-let pointLight: PointLight
-let cube: Mesh
-let camera: PerspectiveCamera
-let cameraControls: OrbitControls
-let dragControls: DragControls
-let axesHelper: AxesHelper
-let pointLightHelper: PointLightHelper
-let clock: Clock
-let stats: Stats
-let gui: GUI
+let canvas;
+let renderer;
+let scene;
+let ambientLight;
+let pointLight;
+let cube;
+let camera;
+let cameraControls;
+let dragControls;
+let axesHelper;
+let pointLightHelper;
+let clock;
+let stats;
+let gui;
 
 const animation = { enabled: false, play: true }
 
@@ -64,7 +64,7 @@ animate()
 function init() {
   // ===== 🖼️ CANVAS, RENDERER, & SCENE =====
   {
-    canvas = document.querySelector(`canvas#${CANVAS_ID}`)!
+    canvas = document.querySelector(`canvas#${CANVAS_ID}`);
     renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.shadowMap.enabled = true
@@ -86,16 +86,7 @@ function init() {
   scene.add(ambientLight)
   scene.add(pointLight)
 
-  interface LoadedType {
-    loaded: Number;
-    total: Number;
-  }
 
-
-  interface LoadedElementsType {
-    env: LoadedType,
-    glb_botella: LoadedType
-  }
 
   const InitialLoadData = {
     loaded: 0,
@@ -103,7 +94,7 @@ function init() {
   }
 
 
-  const loadedElements: LoadedElementsType = {
+  const loadedElements = {
     env: InitialLoadData,
     glb_botella: InitialLoadData
   }

@@ -1,5 +1,5 @@
 // @ts-nocheck
-export function toggleFullScreen(canvas: HTMLElement) {
+export function toggleFullScreen(canvas) {
   if (document.fullscreenElement) {
     document.exitFullscreen()
   } else if (!document.fullscreenElement && canvas.requestFullscreen) {
