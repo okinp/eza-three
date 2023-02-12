@@ -91,6 +91,7 @@ function createPhysicalMaterialGui(folderName: string, material: MeshPhysicalMat
 }
 
 export function setupGui(store: IStore ){
+    return;
 
     const gui = new GUI({ title: '🐞 Debug GUI', width: 400 });
     
@@ -122,48 +123,48 @@ export function setupGui(store: IStore ){
     }
 
 
-    gui.addColor( spotLightParams, 'color' ).onChange( function ( val: number ) {
+    // gui.addColor( spotLightParams, 'color' ).onChange( function ( val: number ) {
 
-      spotLight.color.setHex( val );
+    //   spotLight.color.setHex( val );
 
-    } );
+    // } );
 
-    gui.add( spotLightParams, 'intensity', 0, 10 ).onChange( function ( val: number ) {
+    // gui.add( spotLightParams, 'intensity', 0, 10 ).onChange( function ( val: number ) {
 
-      spotLight.intensity = val;
+    //   spotLight.intensity = val;
 
-    } );
+    // } );
 
 
-    gui.add( spotLightParams, 'distance', 50, 200 ).onChange( function ( val: number ) {
+    // gui.add( spotLightParams, 'distance', 50, 200 ).onChange( function ( val: number ) {
 
-      spotLight.distance = val;
+    //   spotLight.distance = val;
 
-    } );
+    // } );
 
-    gui.add( spotLightParams, 'angle', 0, Math.PI / 3 ).onChange( function ( val: number ) {
+    // gui.add( spotLightParams, 'angle', 0, Math.PI / 3 ).onChange( function ( val: number ) {
 
-      spotLight.angle = val;
+    //   spotLight.angle = val;
 
-    } );
+    // } );
 
-    gui.add( spotLightParams, 'penumbra', 0, 1 ).onChange( function ( val: number ) {
+    // gui.add( spotLightParams, 'penumbra', 0, 1 ).onChange( function ( val: number ) {
 
-      spotLight.penumbra = val;
+    //   spotLight.penumbra = val;
 
-    } );
+    // } );
 
-    gui.add( spotLightParams, 'decay', 1, 2 ).onChange( function ( val: number ) {
+    // gui.add( spotLightParams, 'decay', 1, 2 ).onChange( function ( val: number ) {
 
-      spotLight.decay = val;
+    //   spotLight.decay = val;
 
-    } );
+    // } );
 
-    gui.add( spotLightParams, 'focus', 0, 1 ).onChange( function ( val: number ) {
+    // gui.add( spotLightParams, 'focus', 0, 1 ).onChange( function ( val: number ) {
 
-      spotLight.shadow.focus = val;
+    //   spotLight.shadow.focus = val;
 
-    } );
+    // } );
 
 
 

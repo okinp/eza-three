@@ -22,6 +22,7 @@ import {
   SpotLight,
   SpotLightHelper,
   MeshPhysicalMaterial,
+  sRGBEncoding,
 } from 'three';
 
 import { setupGui } from './gui';
@@ -90,6 +91,8 @@ const store: IStore = {
   prevHeight: 0
 }
 
+let sceneChildren: Object3D[] = [];
+ 
 function toRadians(angle: number) {
   return angle * (Math.PI / 180);
 }
@@ -213,10 +216,13 @@ function setupRenderer() {
   if (!canvas) return false;
   store.canvas = canvas;
   const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true })
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.shadowMap.enabled = true
-  renderer.shadowMap.type = PCFSoftShadowMap
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.shadowMap.enabled = true;
+  renderer.outputEncoding = sRGBEncoding;
   renderer.toneMapping = ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1;
+  // renderer.shadowMap.type = PCFSoftShadowMap
+  // renderer.toneMapping = ACESFilmicToneMapping;
   // renderer.physicallyCorrectLights = true;
   // renderer.toneMappingExposure = 0.2;
 
@@ -388,48 +394,18 @@ export function init() {
 
   Promise.all([createTexturesAndMaterials(), modelLoader.loadAsync(`/glb/${bottleName}.glb`), loadEnvMap()])
     .then(([{ }, gltf, { pmremGenerator, HDRImap }]) => {
+      
       const container = new Object3D();
-      // const model = gltf.scene.children;
       const bottleMesh = gltf.scene.children[0];
-      store.bottleMaterial = ((bottleMesh as Mesh).material as MeshPhysicalMaterial);
-      console.log(store.bottleMaterial);
       const capMesh = gltf.scene.children[1];
       const labelTopMesh = gltf.scene.children[2];
-      const bottleInnerMesh = gltf.scene.children[3];
-      store.liquidMaterial = ((bottleInnerMesh as Mesh).material as MeshPhysicalMaterial);
-      //console.log(bottleInnerMesh);
       const labelFrontMesh = gltf.scene.children[4];
+      const bottleInnerMesh = gltf.scene.children[3];
       const labelBackMesh = gltf.scene.children[5];
 
-      console.log(bottleMesh);
-      console.log(bottleInnerMesh);
+      store.bottleMaterial = ((bottleMesh as Mesh).material as MeshPhysicalMaterial);
+      store.liquidMaterial = ((bottleInnerMesh as Mesh).material as MeshPhysicalMaterial);
 
-
-      // model.traverse(object => {
-      //   if (object.type !== 'Mesh') return;
-      //   switch (object.name) {
-      //     case 'bottle':
-      //       (object as Mesh).material = materials.bottleMaterial;
-      //       object.renderOrder = 0
-      //       break;
-      //     case 'bottle-inner':
-      //       (object as Mesh).material = materials.bottleInnerMaterial;
-      //       object.renderOrder = 1
-      //       break;
-      //     case 'label-front':
-      //       (object as Mesh).material = materials.labelFrontMaterial
-      //       object.renderOrder = 3
-      //       break;
-      //     case 'label-back':
-      //       (object as Mesh).material = materials.labelBackMaterial
-      //       object.renderOrder = 2
-      //       break;
-      //     // case 'cap':
-      //     //   (object as Mesh).material = materials.capMaterial
-      //     //   object.renderOrder = 2
-      //     //   break;
-      //   }
-      // })
       container.add(bottleMesh);
       container.add(capMesh);
       container.add(labelTopMesh);
@@ -501,7 +477,7 @@ export function init() {
 
   // ==== 🐞 DEBUG GUI ====
 
-  // setupGui(store);
+  setupGui(store);
 
 }
 
