@@ -1,26 +1,32 @@
-import GUI from 'lil-gui'
 import {
   AmbientLight,
   AxesHelper,
   CircleGeometry,
   Clock,
+  DirectionalLight,
   DoubleSide,
   Euler,
   HalfFloatType,
   Mesh,
   MeshBasicMaterial,
   Object3D,
+  ACESFilmicToneMapping,
   PCFSoftShadowMap,
   PerspectiveCamera,
+  PointLightHelper,
   PMREMGenerator,
   PointLight,
-  PointLightHelper,
   Quaternion,
   Scene,
-  WebGLRenderer
-} from 'three'
+  WebGLRenderer,
+  SpotLight,
+  SpotLightHelper,
+  MeshPhysicalMaterial,
+} from 'three';
 
+import { setupGui } from './gui';
 
+import type { IStore } from "./interfaces";
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
@@ -39,8 +45,8 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 import { createTexturesAndMaterials } from "./materials"
 
 
-import { DragControls } from 'three/examples/jsm/controls/DragControls'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+// import { DragControls } from 'three/examples/jsm/controls/DragControls'
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module'
 
 import { observeResize } from './helpers/responsiveness';
@@ -49,50 +55,26 @@ const CANVAS_ID = 'scene'
 
 const CONTAINER_ID = "CanvasFrame";
 
-interface IScreenCoordinate {
-  x: number,
-  y: number
-}
-
-interface IStore {
-  container: HTMLElement | undefined,
-  canvas: HTMLElement | undefined,
-  renderer: WebGLRenderer | undefined,
-  scene: Scene | undefined,
-  ambientLight: AmbientLight | undefined,
-  pointLight: PointLight | undefined,
-  camera: PerspectiveCamera | undefined,
-  cameraControls: OrbitControls | undefined,
-  dragControls: DragControls | undefined,
-  axesHelper: AxesHelper | undefined,
-  pointLightHelper: PointLightHelper | undefined,
-  clock: Clock | undefined,
-  stats: Stats | undefined,
-  gui: GUI | undefined,
-  animation: { enabled: boolean, play: boolean },
-  circleMesh: Mesh | undefined,
-  isDragging: boolean,
-  isScrolling: boolean,
-  previousMousePosition: IScreenCoordinate,
-  deltaMove: IScreenCoordinate,
-  model: Object3D | undefined,
-  startTouch: IScreenCoordinate,
-  moveTouch: IScreenCoordinate,
-  prevHeight: number
-}
 
 const store: IStore = {
+  bottleMaterial: undefined,
+  liquidMaterial: undefined,
   container: undefined,
   canvas: undefined,
   renderer: undefined,
   scene: undefined,
   ambientLight: undefined,
-  pointLight: undefined,
+  spotLight: undefined,
+  spotLightHelper: undefined,
+  pointLight1: undefined,
+  pointLight2: undefined,
+  pointLight3: undefined,
+  pointLightHelper1: undefined,
+  directionalLight: undefined,
   camera: undefined,
   cameraControls: undefined,
   dragControls: undefined,
   axesHelper: undefined,
-  pointLightHelper: undefined,
   clock: undefined,
   stats: undefined,
   gui: undefined,
@@ -104,7 +86,7 @@ const store: IStore = {
   deltaMove: { x: 0, y: 0 },
   model: undefined,
   startTouch: { x: 0, y: 0 },
-  moveTouch: { x: 0, y: 0},
+  moveTouch: { x: 0, y: 0 },
   prevHeight: 0
 }
 
@@ -112,9 +94,9 @@ function toRadians(angle: number) {
   return angle * (Math.PI / 180);
 }
 
-function performTouchScroll(){
+function performTouchScroll() {
   const currentScroll = window.scrollY;
-  const numPixelsToScroll = 2*(store.startTouch.y - store.moveTouch.y);
+  const numPixelsToScroll = 2 * (store.startTouch.y - store.moveTouch.y);
 
   window.scroll({
     top: currentScroll + numPixelsToScroll,
@@ -122,17 +104,13 @@ function performTouchScroll(){
   })
 }
 
-function windowScroll(){
+function windowScroll() {
   // @ts-ignore
   const currentHeight = (luxy.wapperOffset || 0 as number);
 
-  //Text things go here
-  
-  
-  //
 
+  if (store.isScrolling && (Math.abs(currentHeight - store.prevHeight) > 0.5)) {
 
-  if (store.isScrolling && (currentHeight !== store.prevHeight) ){
     const deltaRot = new Quaternion().setFromEuler(
       new Euler(
         0,
@@ -141,7 +119,7 @@ function windowScroll(){
         "XYZ"
       )
     );
-  
+
     const bottle = store.model as Object3D;
     bottle.quaternion.multiplyQuaternions(deltaRot, bottle.quaternion);
   }
@@ -207,7 +185,7 @@ function setupEventListeners() {
       y: evt.touches[0].clientY
     }
 
-    if (Math.abs(store.moveTouch.x - store.moveTouch.y) > 50){
+    if (Math.abs(store.moveTouch.x - store.moveTouch.y) > 50) {
       releaseTouch()
     }
 
@@ -217,12 +195,12 @@ function setupEventListeners() {
     }
   })
 
-  document.addEventListener('mouseup', () => {
+  window.addEventListener('mouseup', () => {
     store.isDragging = false;
     store.isScrolling = true;
   });
 
-  document.addEventListener("touchend", () => {
+  window.addEventListener("touchend", () => {
     store.previousMousePosition = { ...store.deltaMove };
     store.isDragging = false;
 
@@ -230,19 +208,22 @@ function setupEventListeners() {
 }
 
 
-
-
-
-
 function setupRenderer() {
   const canvas = (document.querySelector(`canvas#${CANVAS_ID}`) as HTMLElement);
   if (!canvas) return false;
   store.canvas = canvas;
   const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true })
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true
-  renderer.shadowMap.type = PCFSoftShadowMap;
+  renderer.shadowMap.type = PCFSoftShadowMap
+  renderer.toneMapping = ACESFilmicToneMapping;
+  // renderer.physicallyCorrectLights = true;
+  // renderer.toneMappingExposure = 0.2;
+
+  // renderer.shadowMap.enabled = true
+
   store.renderer = renderer;
+  //console.log(renderer);
   return true;
 }
 
@@ -270,31 +251,127 @@ function createCircleMesh() {
 }
 
 function setupLights(scene: Scene) {
-  const ambientLight = new AmbientLight('white', 0.4);
-  const pointLight = new PointLight('#ffdca8', 1.2, 100);
-  pointLight.position.set(-2, 3, 3);
-  pointLight.castShadow = true;
-  pointLight.shadow.radius = 4;
-  pointLight.shadow.camera.near = 0.5;
-  pointLight.shadow.camera.far = 4000;
-  pointLight.shadow.mapSize.width = 2048;
-  pointLight.shadow.mapSize.height = 2048;;
-  scene.add(ambientLight);
-  scene.add(pointLight);
+  const ambientLight = new AmbientLight(0xffffff, 10);
   store.ambientLight = ambientLight;
-  store.pointLight = pointLight
+
+  const pointLight1 = new PointLight("#ffffff", 1.2, 100);
+  pointLight1.position.set(-2, 3, 3);
+  pointLight1.castShadow = true
+  pointLight1.shadow.radius = 4
+  pointLight1.shadow.camera.near = 0.5
+  pointLight1.shadow.camera.far = 4000
+  pointLight1.shadow.mapSize.width = 2048
+  pointLight1.shadow.mapSize.height = 2048
+  store.pointLight1 = pointLight1;
+
+
+  const pointLight2 = new PointLight(0xffffff, 25, 50);
+  pointLight2.position.set(-5, -2, -10);
+  store.pointLight2 = pointLight2;
+
+  const pointLight3 = new PointLight(0xffffff, 25, 50);
+  pointLight3.position.set(0, -5, -5);
+  store.pointLight3 = pointLight3;
+
+  const directionalLight = new DirectionalLight(0xffffff, 12);
+  directionalLight.position.set(0, 0, 5);
+  directionalLight.target.position.set(0, 0, 0);
+  store.directionalLight = directionalLight;
+
+  const spotLight = new SpotLight(0xffffff, 5);
+  spotLight.position.set(25, 50, 25);
+  spotLight.angle = Math.PI / 6;
+  spotLight.penumbra = 1;
+  spotLight.decay = 2;
+  spotLight.distance = 100;
+  // spotLight.map = textures[ 'disturb.jpg' ];
+
+  spotLight.castShadow = true;
+  spotLight.shadow.mapSize.width = 1024;
+  spotLight.shadow.mapSize.height = 1024;
+  spotLight.shadow.camera.near = 10;
+  spotLight.shadow.camera.far = 200;
+  spotLight.shadow.focus = 1;
+  scene.add(spotLight);
+
+  const spotLightHelper = new SpotLightHelper(spotLight);
+  spotLightHelper.color = 0x000000;
+  scene.add(spotLightHelper);
+  store.spotLight = spotLight;
+  store.spotLightHelper = spotLightHelper;
+
+  scene.add(pointLight1);
+  scene.add(pointLight2);
+  scene.add(pointLight3);
+  scene.add(directionalLight);
+  scene.add(ambientLight);
+
+}
+
+
+async function loadEnvMap() {
+  const envLoader = new RGBELoader();
+  envLoader.setDataType(HalfFloatType);
+  const pmremGenerator = new PMREMGenerator((store.renderer as WebGLRenderer));
+  pmremGenerator.compileEquirectangularShader();
+
+  const env = await envLoader.loadAsync(`/envmap/studio_country_hall_1k.hdr`);
+  const HDRImap = pmremGenerator.fromEquirectangular(env).texture;
+
+  return {
+    HDRImap, pmremGenerator
+  }
+
+  // if (store.scene) {
+  //   store.scene.environment = HDRImap;
+  //   (store.bottleMaterial as MeshPhysicalMaterial).envMap = HDRImap;
+  //   HDRImap.dispose()
+  //   pmremGenerator.dispose()
+  // }
+}
+
+// envLoader
+//   .setDataType(HalfFloatType)
+//   .load(`/envmap/studio_country_hall_1k.hdr`,
+//     (env) => {
+//       //console.log(env)
+//       pmremGenerator.compileEquirectangularShader()
+//       const HDRImap = pmremGenerator.fromEquirectangular(env).texture
+
+//       if (store.scene) {
+//         store.scene.environment = HDRImap;
+//         (store.bottleMaterial as MeshPhysicalMaterial).envMap = HDRImap;
+//         HDRImap.dispose()
+//         pmremGenerator.dispose()
+//       }
+//     },
+//     (xhr) => {
+//       loadedElements.env = { loaded: xhr.loaded, total: xhr.total }
+//     },
+//   )
+// }
+
+function handleOnLoaded(){
+  console.log("loaded")
 }
 
 export function init() {
+
   store.container = document.getElementById(CONTAINER_ID) || undefined;
+
+  const bottleName = store.container?.dataset.type || 'lagernew';
+  
   store.scene = new Scene();
+  
   const success = setupRenderer();
+  
   if (!success) return;
+  
   setupLights(store.scene);
   setupCamera();
 
-
-  store.scene = new Scene();
+  const scene = new Scene();
+  store.scene = scene;
 
   store.circleMesh = createCircleMesh();
   store.scene.add(store.circleMesh);
@@ -307,38 +384,25 @@ export function init() {
 
 
 
-
-
-
-
-  const InitialLoadData = {
-    loaded: 0,
-    total: 0
-  }
-
-
-  const loadedElements = {
-    env: InitialLoadData,
-    glb_botella: InitialLoadData
-  }
-
-
-
   const modelLoader = new GLTFLoader();
 
-
-  Promise.all([createTexturesAndMaterials(), modelLoader.loadAsync('/glb/lagernew.glb')])
-    .then(([{ }, gltf]) => {
-      console.log(gltf);
+  Promise.all([createTexturesAndMaterials(), modelLoader.loadAsync(`/glb/${bottleName}.glb`), loadEnvMap()])
+    .then(([{ }, gltf, { pmremGenerator, HDRImap }]) => {
       const container = new Object3D();
       // const model = gltf.scene.children;
       const bottleMesh = gltf.scene.children[0];
+      store.bottleMaterial = ((bottleMesh as Mesh).material as MeshPhysicalMaterial);
+      console.log(store.bottleMaterial);
       const capMesh = gltf.scene.children[1];
       const labelTopMesh = gltf.scene.children[2];
       const bottleInnerMesh = gltf.scene.children[3];
-      console.log(bottleInnerMesh);
+      store.liquidMaterial = ((bottleInnerMesh as Mesh).material as MeshPhysicalMaterial);
+      //console.log(bottleInnerMesh);
       const labelFrontMesh = gltf.scene.children[4];
       const labelBackMesh = gltf.scene.children[5];
+
+      console.log(bottleMesh);
+      console.log(bottleInnerMesh);
 
 
       // model.traverse(object => {
@@ -377,35 +441,20 @@ export function init() {
       container.rotation.set(0, 0, Math.PI / 9);
       store.model = container;
 
-      store.scene && store.scene.add(container)
-    })
+      scene.add(container);
+
+
+      scene.environment = HDRImap;
+      (store.bottleMaterial as MeshPhysicalMaterial).envMap = HDRImap;
+      HDRImap.dispose()
+      pmremGenerator.dispose()
+    }).then(handleOnLoaded)
+    .then(() => setupGui(store));
 
 
 
 
-  const envLoader = new RGBELoader();
-  const pmremGenerator = new PMREMGenerator((store.renderer as WebGLRenderer));
 
-
-
-  envLoader
-    .setDataType(HalfFloatType)
-    .load(`/envmap/studio_country_hall_1k.hdr`,
-      (env) => {
-        console.log(env)
-        pmremGenerator.compileEquirectangularShader()
-        const HDRImap = pmremGenerator.fromEquirectangular(env).texture
-
-        if (store.scene) {
-          store.scene.environment = HDRImap
-          HDRImap.dispose()
-          pmremGenerator.dispose()
-        }
-      },
-      (xhr) => {
-        loadedElements.env = { loaded: xhr.loaded, total: xhr.total }
-      },
-    )
 
 
 
@@ -435,9 +484,11 @@ export function init() {
     store.axesHelper.visible = false
     store.scene.add(store.axesHelper)
 
-    store.pointLightHelper = new PointLightHelper((store.pointLight as PointLight), undefined, 'orange')
-    store.pointLightHelper.visible = false
-    store.scene.add(store.pointLightHelper)
+    const pointLightHelper1 = new PointLightHelper((store.pointLight1 as PointLight), 1);
+    pointLightHelper1.visible = true;
+    pointLightHelper1.color = 0xff0000;
+    store.pointLightHelper1 = pointLightHelper1;
+    store.scene.add(store.pointLightHelper1)
 
   }
 
@@ -449,39 +500,17 @@ export function init() {
   }
 
   // ==== 🐞 DEBUG GUI ====
-  {
-    store.gui = new GUI({ title: '🐞 Debug GUI', width: 300 })
 
-    const lightsFolder = store.gui.addFolder('Lights')
-    lightsFolder.add((store.pointLight as PointLight), 'visible').name('point light')
-    lightsFolder.add((store.ambientLight as AmbientLight), 'visible').name('ambient light')
+  // setupGui(store);
 
-
-    // persist GUI state in local storage on changes
-    store.gui.onFinishChange(() => {
-      const guiState = (store.gui as GUI).save()
-      localStorage.setItem('guiState', JSON.stringify(guiState))
-    })
-
-    // load GUI state if available in local storage
-    const guiState = localStorage.getItem('guiState')
-    if (guiState) store.gui.load(JSON.parse(guiState))
-
-    // reset GUI state button
-    const resetGui = () => {
-      localStorage.removeItem('guiState')
-      store.gui?.reset()
-    }
-    store.gui.add({ resetGui }, 'resetGui').name('RESET')
-
-    store.gui.close()
-  }
 }
 
 export function animate() {
   requestAnimationFrame(animate)
 
   store?.stats && store.stats.update()
+
+  store?.pointLightHelper1 && store.pointLightHelper1.update();
 
   // store.cameraControls && store.cameraControls.update()
 
