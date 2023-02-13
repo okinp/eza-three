@@ -1,6 +1,5 @@
 import {
   AmbientLight,
-  AxesHelper,
   CircleGeometry,
   Clock,
   DirectionalLight,
@@ -11,9 +10,7 @@ import {
   MeshBasicMaterial,
   Object3D,
   ACESFilmicToneMapping,
-  PCFSoftShadowMap,
   PerspectiveCamera,
-  PointLightHelper,
   PMREMGenerator,
   PointLight,
   Quaternion,
@@ -27,11 +24,15 @@ import {
 
 import { setupGui } from './gui';
 
-import type { IStore } from "./interfaces";
+
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 // import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
+
+import store from "./store";
+
+import { toRadians } from './helpers/utils';
 
 // import {
 //   EffectComposer, RenderPass, EffectPass,
@@ -56,46 +57,8 @@ const CANVAS_ID = 'scene'
 
 const CONTAINER_ID = "CanvasFrame";
 
-
-const store: IStore = {
-  bottleMaterial: undefined,
-  liquidMaterial: undefined,
-  container: undefined,
-  canvas: undefined,
-  renderer: undefined,
-  scene: undefined,
-  ambientLight: undefined,
-  spotLight: undefined,
-  spotLightHelper: undefined,
-  pointLight1: undefined,
-  pointLight2: undefined,
-  pointLight3: undefined,
-  pointLightHelper1: undefined,
-  directionalLight: undefined,
-  camera: undefined,
-  cameraControls: undefined,
-  dragControls: undefined,
-  axesHelper: undefined,
-  clock: undefined,
-  stats: undefined,
-  gui: undefined,
-  animation: { enabled: false, play: false },
-  circleMesh: undefined,
-  isDragging: false,
-  isScrolling: true,
-  previousMousePosition: { x: 0, y: 0 },
-  deltaMove: { x: 0, y: 0 },
-  model: undefined,
-  startTouch: { x: 0, y: 0 },
-  moveTouch: { x: 0, y: 0 },
-  prevHeight: 0
-}
-
-let sceneChildren: Object3D[] = [];
  
-function toRadians(angle: number) {
-  return angle * (Math.PI / 180);
-}
+
 
 function performTouchScroll() {
   const currentScroll = window.scrollY;
@@ -425,59 +388,17 @@ export function init() {
       HDRImap.dispose()
       pmremGenerator.dispose()
     }).then(handleOnLoaded)
-    .then(() => setupGui(store));
+    .then(() => setupGui());
 
-
-
-
-
-
-
-
-
-
-  // ===== 🕹️ CONTROLS =====
-
-  // store.cameraControls = new OrbitControls((store.camera as PerspectiveCamera), (store.canvas as HTMLElement));
-  // // cameraControls.target = cube.position.clone()
-  // store.cameraControls.enableZoom = false;
-  // store.cameraControls.enablePan = false;
-  // // cameraControls.enableRotate = true;
-  // store.cameraControls.enableDamping = true
-  // store.cameraControls.autoRotate = false;
-  // store.cameraControls.minPolarAngle = Math.PI / 2 ;
-  // store.cameraControls.maxPolarAngle = Math.PI / 2 ;
-  // store.cameraControls.update();
-
-
-
-
-
-
-  // ===== 🪄 HELPERS =====
-  {
-    store.axesHelper = new AxesHelper(4)
-    store.axesHelper.visible = false
-    store.scene.add(store.axesHelper)
-
-    const pointLightHelper1 = new PointLightHelper((store.pointLight1 as PointLight), 1);
-    pointLightHelper1.visible = true;
-    pointLightHelper1.color = 0xff0000;
-    store.pointLightHelper1 = pointLightHelper1;
-    store.scene.add(store.pointLightHelper1)
-
-  }
 
   // ===== 📈 STATS & CLOCK =====
-  {
     store.clock = new Clock()
     store.stats = Stats()
     document.body.appendChild(store.stats.dom)
-  }
 
   // ==== 🐞 DEBUG GUI ====
 
-  setupGui(store);
+  // setupGui(store);
 
 }
 

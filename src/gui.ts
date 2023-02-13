@@ -1,6 +1,7 @@
 import GUI from 'lil-gui'
-import { MeshPhysicalMaterial, PointLight, SpotLight } from 'three';
-import type { IStore } from "./interfaces"; 
+import { MeshPhysicalMaterial, PointLight } from 'three';
+import store from "./store";
+// import type { IStore } from "./interfaces"; 
 // import { Color } from "three";
 
 interface PhysicalMaterialParams {
@@ -63,6 +64,23 @@ function addMaterialBooleanToGui(params: PhysicalMaterialParams, property: Boole
     } );
 }
 
+// interface LightParams {
+//   color?: number,
+//   intensity?: number
+// }
+
+// interface PointLightParams extends LightParams {
+//   decay?: number,
+//   distance?: number,
+//   intensity?: number,
+//   power?: number
+// }
+
+// interface DirectionalLightParams extends LightParams {
+
+// }
+
+
 
 
 
@@ -90,8 +108,7 @@ function createPhysicalMaterialGui(folderName: string, material: MeshPhysicalMat
     addMaterialBooleanToGui(params, 'wireframe', materialFolder, material);
 }
 
-export function setupGui(store: IStore ){
-    return;
+export function setupGui( ){
 
     const gui = new GUI({ title: '🐞 Debug GUI', width: 400 });
     
@@ -109,18 +126,18 @@ export function setupGui(store: IStore ){
     lightsFolder.add(pointLight1, 'color', -50, 50, 0.01);
 
 
-    const spotLight = store.spotLight as SpotLight;
+    // const spotLight = store.spotLight as SpotLight;
 
-    const spotLightParams = {
-      color: spotLight.color.getHex(),
-      intensity: spotLight.intensity,
-      distance: spotLight.distance,
-      angle: spotLight.angle,
-      penumbra: spotLight.penumbra,
-      decay: spotLight.decay,
-      focus: spotLight.shadow.focus,
-      shadows: true
-    }
+    // const spotLightParams = {
+    //   color: spotLight.color.getHex(),
+    //   intensity: spotLight.intensity,
+    //   distance: spotLight.distance,
+    //   angle: spotLight.angle,
+    //   penumbra: spotLight.penumbra,
+    //   decay: spotLight.decay,
+    //   focus: spotLight.shadow.focus,
+    //   shadows: true
+    // }
 
 
     // gui.addColor( spotLightParams, 'color' ).onChange( function ( val: number ) {
