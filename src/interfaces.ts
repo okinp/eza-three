@@ -56,5 +56,6 @@ export interface IStore {
     model: Object3D | undefined,
     startTouch: IScreenCoordinate,
     moveTouch: IScreenCoordinate,
-    prevHeight: number
+    prevHeight: number,
+    isReady: boolean
   }

@@ -92,6 +92,9 @@ function createPhysicalMaterialGui(folderName: string, material: MeshPhysicalMat
     const materialFolder = gui.addFolder(folderName);
     const params = createPhysicalMaterialParams(material);
 
+    console.log(material)
+    material.depthWrite = true;
+
     addMaterialColorToGui(params, 'color', materialFolder, material);
     addMaterialColorToGui(params, 'attenuationColor', materialFolder, material);
     addMaterialColorToGui(params, 'emissive', materialFolder, material);
@@ -113,17 +116,17 @@ export function setupGui( ){
     const gui = new GUI({ title: '🐞 Debug GUI', width: 400 });
     
     
-    const lightsFolder = gui.addFolder('Lights');
+    // const lightsFolder = gui.addFolder('Lights');
 
-    const pointLight1 = store.pointLight1 as PointLight;
+    // const pointLight1 = store.pointLight1 as PointLight;
 
-    lightsFolder.add(pointLight1, 'visible').name('point light 1');
-    lightsFolder.add(pointLight1, 'distance', 0, 100, 0.01)
-    lightsFolder.add(pointLight1, 'decay', 0, 4, 0.1)
-    lightsFolder.add(pointLight1.position, 'x', -50, 50, 0.01)
-    lightsFolder.add(pointLight1.position, 'y', -50, 50, 0.01)
-    lightsFolder.add(pointLight1.position, 'z', -50, 50, 0.01)
-    lightsFolder.add(pointLight1, 'color', -50, 50, 0.01);
+    // lightsFolder.add(pointLight1, 'visible').name('point light 1');
+    // lightsFolder.add(pointLight1, 'distance', 0, 100, 0.01)
+    // lightsFolder.add(pointLight1, 'decay', 0, 4, 0.1)
+    // lightsFolder.add(pointLight1.position, 'x', -50, 50, 0.01)
+    // lightsFolder.add(pointLight1.position, 'y', -50, 50, 0.01)
+    // lightsFolder.add(pointLight1.position, 'z', -50, 50, 0.01)
+    // lightsFolder.add(pointLight1, 'color', -50, 50, 0.01);
 
 
     // const spotLight = store.spotLight as SpotLight;

@@ -34,21 +34,8 @@ import store from "./store";
 
 import { toRadians } from './helpers/utils';
 
-// import {
-//   EffectComposer, RenderPass, EffectPass,
-//   BlendFunction,
-//   ToneMappingEffect, ToneMappingMode,
-//   NoiseEffect,
-//   DepthOfFieldEffect,
-//   BloomEffect, KernelSize,
-//   // SMAAImageLoader, SMAAEffect, SMAAPreset, EdgeDetectionMode,
-// } from "postprocessing"
-
 import { createTexturesAndMaterials } from "./materials"
 
-
-// import { DragControls } from 'three/examples/jsm/controls/DragControls'
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module'
 
 import { observeResize } from './helpers/responsiveness';
@@ -56,8 +43,6 @@ import { observeResize } from './helpers/responsiveness';
 const CANVAS_ID = 'scene'
 
 const CONTAINER_ID = "CanvasFrame";
-
- 
 
 
 function performTouchScroll() {
@@ -105,6 +90,8 @@ function setupEventListeners() {
   const canvas = store.canvas;
   if (!canvas) return;
 
+  // alert('setup')
+
   canvas.addEventListener("mousedown", () => {
     store.isDragging = true;
     store.isScrolling = false;
@@ -128,49 +115,49 @@ function setupEventListeners() {
     store.previousMousePosition = { x: evt.offsetX, y: evt.offsetY }
   });
 
-  canvas.addEventListener("touchstart", (evt: TouchEvent) => {
-    store.previousMousePosition = {
-      x: evt.touches[0].clientX,
-      y: evt.touches[0].clientY
-    }
-    store.isDragging = true;
-    store.startTouch = {
-      x: evt.touches[0].clientX,
-      y: evt.touches[0].clientY
-    }
-  })
+  // canvas.addEventListener("touchstart", (evt: TouchEvent) => {
+  //   store.previousMousePosition = {
+  //     x: evt.touches[0].clientX,
+  //     y: evt.touches[0].clientY
+  //   }
+  //   store.isDragging = true;
+  //   store.startTouch = {
+  //     x: evt.touches[0].clientX,
+  //     y: evt.touches[0].clientY
+  //   }
+  // })
 
-  canvas.addEventListener("touchmove", (evt: TouchEvent) => {
-    store.deltaMove = {
-      x: evt.touches[0].clientX - store.previousMousePosition.x,
-      y: evt.touches[0].clientY - store.previousMousePosition.y
-    }
+  // canvas.addEventListener("touchmove", (evt: TouchEvent) => {
+  //   store.deltaMove = {
+  //     x: evt.touches[0].clientX - store.previousMousePosition.x,
+  //     y: evt.touches[0].clientY - store.previousMousePosition.y
+  //   }
 
-    store.moveTouch = {
-      x: evt.touches[0].clientX,
-      y: evt.touches[0].clientY
-    }
+  //   store.moveTouch = {
+  //     x: evt.touches[0].clientX,
+  //     y: evt.touches[0].clientY
+  //   }
 
-    if (Math.abs(store.moveTouch.x - store.moveTouch.y) > 50) {
-      releaseTouch()
-    }
+  //   if (Math.abs(store.moveTouch.x - store.moveTouch.y) > 50) {
+  //     releaseTouch()
+  //   }
 
-    store.previousMousePosition = {
-      x: evt.touches[0].clientX,
-      y: evt.touches[0].clientY
-    }
-  })
+  //   store.previousMousePosition = {
+  //     x: evt.touches[0].clientX,
+  //     y: evt.touches[0].clientY
+  //   }
+  // })
 
   window.addEventListener('mouseup', () => {
     store.isDragging = false;
     store.isScrolling = true;
   });
 
-  window.addEventListener("touchend", () => {
-    store.previousMousePosition = { ...store.deltaMove };
-    store.isDragging = false;
+  // window.addEventListener("touchend", () => {
+  //   store.previousMousePosition = { ...store.deltaMove };
+  //   store.isDragging = false;
 
-  })
+  // })
 }
 
 
@@ -186,7 +173,7 @@ function setupRenderer() {
   renderer.toneMappingExposure = 1;
   // renderer.shadowMap.type = PCFSoftShadowMap
   // renderer.toneMapping = ACESFilmicToneMapping;
-  // renderer.physicallyCorrectLights = true;
+  renderer.physicallyCorrectLights = true;
   // renderer.toneMappingExposure = 0.2;
 
   // renderer.shadowMap.enabled = true
@@ -299,29 +286,13 @@ async function loadEnvMap() {
   // }
 }
 
-// envLoader
-//   .setDataType(HalfFloatType)
-//   .load(`/envmap/studio_country_hall_1k.hdr`,
-//     (env) => {
-//       //console.log(env)
-//       pmremGenerator.compileEquirectangularShader()
-//       const HDRImap = pmremGenerator.fromEquirectangular(env).texture
 
-//       if (store.scene) {
-//         store.scene.environment = HDRImap;
-//         (store.bottleMaterial as MeshPhysicalMaterial).envMap = HDRImap;
-//         HDRImap.dispose()
-//         pmremGenerator.dispose()
-//       }
-//     },
-//     (xhr) => {
-//       loadedElements.env = { loaded: xhr.loaded, total: xhr.total }
-//     },
-//   )
-// }
+function handleOnLoaded() {
+  console.log("loaded");
+  store.isReady = true;
+  setupEventListeners();
+  // setupGui();
 
-function handleOnLoaded(){
-  console.log("loaded")
 }
 
 export function init() {
@@ -329,13 +300,13 @@ export function init() {
   store.container = document.getElementById(CONTAINER_ID) || undefined;
 
   const bottleName = store.container?.dataset.type || 'lagernew';
-  
+
   store.scene = new Scene();
-  
+
   const success = setupRenderer();
-  
+
   if (!success) return;
-  
+
   setupLights(store.scene);
   setupCamera();
 
@@ -357,7 +328,7 @@ export function init() {
 
   Promise.all([createTexturesAndMaterials(), modelLoader.loadAsync(`/glb/${bottleName}.glb`), loadEnvMap()])
     .then(([{ }, gltf, { pmremGenerator, HDRImap }]) => {
-      
+
       const container = new Object3D();
       const bottleMesh = gltf.scene.children[0];
       const capMesh = gltf.scene.children[1];
@@ -366,8 +337,16 @@ export function init() {
       const bottleInnerMesh = gltf.scene.children[3];
       const labelBackMesh = gltf.scene.children[5];
 
-      store.bottleMaterial = ((bottleMesh as Mesh).material as MeshPhysicalMaterial);
-      store.liquidMaterial = ((bottleInnerMesh as Mesh).material as MeshPhysicalMaterial);
+      const bottleMaterial = ((bottleMesh as Mesh).material as MeshPhysicalMaterial);
+      bottleMaterial.depthTest = true;
+      bottleMaterial.depthWrite = true;
+      const liquidMaterial = ((bottleInnerMesh as Mesh).material as MeshPhysicalMaterial);
+      liquidMaterial.depthTest = true;
+      liquidMaterial.depthWrite = true;
+
+      store.bottleMaterial = bottleMaterial;
+      store.liquidMaterial = liquidMaterial;
+
 
       container.add(bottleMesh);
       container.add(capMesh);
@@ -388,17 +367,14 @@ export function init() {
       HDRImap.dispose()
       pmremGenerator.dispose()
     }).then(handleOnLoaded)
-    .then(() => setupGui());
+    // .then(() => setupGui());
 
 
   // ===== 📈 STATS & CLOCK =====
-    store.clock = new Clock()
-    store.stats = Stats()
-    document.body.appendChild(store.stats.dom)
+  store.clock = new Clock()
+  store.stats = Stats()
+  document.body.appendChild(store.stats.dom)
 
-  // ==== 🐞 DEBUG GUI ====
-
-  // setupGui(store);
 
 }
 
@@ -409,12 +385,12 @@ export function animate() {
 
   store?.pointLightHelper1 && store.pointLightHelper1.update();
 
-  // store.cameraControls && store.cameraControls.update()
-
   if (store.scene && store.camera && store.renderer) {
     store.renderer.render(store.scene, store.camera)
   }
 
-  windowScroll();
+  if (store.isReady){
+    windowScroll();
+  }
 
 }

@@ -31,7 +31,8 @@ const store: IStore = {
     model: undefined,
     startTouch: { x: 0, y: 0 },
     moveTouch: { x: 0, y: 0 },
-    prevHeight: 0
+    prevHeight: 0,
+    isReady: false
   };
 
 export default store;
