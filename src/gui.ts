@@ -1,5 +1,5 @@
 import GUI from 'lil-gui'
-import { MeshPhysicalMaterial, PointLight } from 'three';
+import { MeshPhysicalMaterial } from 'three';
 import store from "./store";
 // import type { IStore } from "./interfaces"; 
 // import { Color } from "three";

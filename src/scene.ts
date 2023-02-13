@@ -23,7 +23,7 @@ import {
   Vector2,
 } from 'three';
 
-import { setupGui } from './gui';
+// import { setupGui } from './gui';
 
 
 
@@ -98,10 +98,12 @@ function setupEventListeners() {
   if (!canvas) return;
 
 
+
   canvas.addEventListener("mousedown", (evt: MouseEvent) => {
     dragState.status = 'DRAG';
     dragState.initial = new Vector2(evt.offsetX, evt.offsetY);
-    dragState.originalRotation = store.model?.quaternion || new Quaternion()
+    dragState.originalRotation = store.model?.quaternion || new Quaternion();
+
   })
 
   canvas.addEventListener("mousemove", (evt: MouseEvent) => {
