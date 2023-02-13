@@ -19,6 +19,8 @@ import {
   SpotLight,
   SpotLightHelper,
   MeshPhysicalMaterial,
+  PointLightHelper,
+  DirectionalLightHelper,
   sRGBEncoding,
   Vector2,
 } from 'three';
@@ -226,8 +228,20 @@ function setupLights(scene: Scene) {
   spotLight.shadow.focus = 1;
   scene.add(spotLight);
 
+  const pointLightHelper1 = new PointLightHelper(pointLight1);
+  pointLightHelper1.color = 0x0000ff;
+  scene.add(pointLightHelper1);
+
+  const pointLightHelper2 = new PointLightHelper(pointLight2);
+  pointLightHelper2.color = 0x0000ff;
+  scene.add(pointLightHelper2);
+
+  const pointLightHelper3 = new PointLightHelper(pointLight3);
+  pointLightHelper3.color = 0x0000ff;
+  scene.add(pointLightHelper3);
+
   const spotLightHelper = new SpotLightHelper(spotLight);
-  spotLightHelper.color = 0x000000;
+  spotLightHelper.color = 0xff0000;
   scene.add(spotLightHelper);
   store.spotLight = spotLight;
   store.spotLightHelper = spotLightHelper;

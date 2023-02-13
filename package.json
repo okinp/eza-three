@@ -6,17 +6,35 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint:ts": "tsc --noEmit",
+    "lint:staged": "lint-staged"
   },
   "devDependencies": {
     "@types/node": "^18.13.0",
     "@types/three": "file:types/@types/three",
+    "eslint": "^8.34.0",
+    "eslint-config-prettier": "^8.6.0",
+    "lint-staged": "^13.1.1",
+    "prettier": "^2.8.4",
     "sass": "^1.58.0",
+    "simple-git-hooks": "^2.8.1",
     "typescript": "^4.9.4",
     "vite": "^4.0.4"
   },
   "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
     "lil-gui": "^0.17.0",
     "three": "0.148.0"
+  },
+  "lint-staged": {
+    "./src/**/*.ts{,x}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm run lint:staged",
+    "pre-push": "npm run lint:ts"
   }
 }

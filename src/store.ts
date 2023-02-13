@@ -24,12 +24,7 @@ const store: IStore = {
     gui: undefined,
     animation: { enabled: false, play: false },
     circleMesh: undefined,
-    isDragging: false,
-    isScrolling: true,
-    previousMousePosition: { x: 0, y: 0 },
-    deltaMove: { x: 0, y: 0 },
     model: undefined,
-    startTouch: { x: 0, y: 0 },
     moveTouch: { x: 0, y: 0 },
     prevHeight: 0,
     isReady: false

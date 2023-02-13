@@ -15,6 +15,16 @@ canvas{
   // display:block;
 }
 
+.helper {
+  &__icon,
+  &__text {
+    user-select: none;
+  }
+}
+
+.parallax-items {
+  user-select: none;
+}
 
 
 // :root {
