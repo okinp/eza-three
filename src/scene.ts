@@ -23,7 +23,7 @@ import {
   Vector2,
 } from 'three';
 
-// import { setupGui } from './gui';
+import { setupGui } from './gui';
 
 
 
@@ -267,7 +267,8 @@ function handleOnLoaded() {
   console.log("loaded");
   store.isReady = true;
   setupEventListeners();
-  // setupGui();
+  
+  setupGui();
 
 }
 
@@ -286,13 +287,13 @@ export function init() {
   setupLights(store.scene);
   setupCamera();
 
-  const scene = new Scene();
-  store.scene = scene;
+  // const scene = new Scene();
+  // store.scene = scene;
 
-  store.circleMesh = createCircleMesh();
-  store.scene.add(store.circleMesh);
+  
+  
 
-  setupEventListeners();
+  // setupEventListeners();
 
   if (store.renderer && store.camera) {
     observeResize(store.renderer, store.camera);
@@ -304,8 +305,12 @@ export function init() {
 
   Promise.all([createTexturesAndMaterials(), modelLoader.loadAsync(`/glb/${bottleName}.glb`), loadEnvMap()])
     .then(([{ }, gltf, { pmremGenerator, HDRImap }]) => {
+      store.container?.classList.remove("loading");
+      store.circleMesh = createCircleMesh();
+      const scene = store.scene as Scene;
 
-      const container = new Object3D();
+      scene.add(store.circleMesh);
+      const parentObject = new Object3D();
       const bottleMesh = gltf.scene.children[0];
       const capMesh = gltf.scene.children[1];
       const labelTopMesh = gltf.scene.children[2];
@@ -324,18 +329,18 @@ export function init() {
       store.liquidMaterial = liquidMaterial;
 
 
-      container.add(bottleMesh);
-      container.add(capMesh);
-      container.add(labelTopMesh);
-      container.add(bottleInnerMesh);
-      container.add(labelFrontMesh);
-      container.add(labelBackMesh);
-      container.position.set(0, 0.5, 0);
-      container.scale.set(2, 2, 2);
-      container.rotation.set(0, 0, Math.PI / 9);
-      store.model = container;
+      parentObject.add(bottleMesh);
+      parentObject.add(capMesh);
+      parentObject.add(labelTopMesh);
+      parentObject.add(bottleInnerMesh);
+      parentObject.add(labelFrontMesh);
+      parentObject.add(labelBackMesh);
+      parentObject.position.set(0, 0.5, 0);
+      parentObject.scale.set(2, 2, 2);
+      parentObject.rotation.set(0, 0, Math.PI / 9);
+      store.model = parentObject;
 
-      scene.add(container);
+      scene.add(parentObject);
 
 
       scene.environment = HDRImap;

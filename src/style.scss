@@ -2,7 +2,11 @@
   width:100%;
   height:100vh;
   top:0;
-  left:0
+  left:0;
+  &.loading {
+    background: url('https://eza.goodfellasstudio.com/3des//spinner/icons8-spinner.gif') no-repeat fixed center;
+  }
+  
 }
 canvas{
   overflow : scroll;
