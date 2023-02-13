@@ -20,9 +20,12 @@ import {
   SpotLightHelper,
   MeshPhysicalMaterial,
   sRGBEncoding,
+  Vector2,
 } from 'three';
 
 import { setupGui } from './gui';
+
+
 
 
 
@@ -45,14 +48,23 @@ const CANVAS_ID = 'scene'
 const CONTAINER_ID = "CanvasFrame";
 
 
-function performTouchScroll() {
-  const currentScroll = window.scrollY;
-  const numPixelsToScroll = 2 * (store.startTouch.y - store.moveTouch.y);
+type DragStatus = 'NONE' | 'DRAG';
 
-  window.scroll({
-    top: currentScroll + numPixelsToScroll,
-    behavior: "smooth"
-  })
+// let dragState: DragState = 'NONE';
+
+interface DragState {
+  status: DragStatus;
+  initial: Vector2;
+  current: Vector2;
+  originalRotation: Quaternion;
+}
+
+
+const dragState: DragState = {
+  status: 'NONE',
+  initial: new Vector2(0,0),
+  current: new Vector2(0,0),
+  originalRotation: new Quaternion()
 }
 
 function windowScroll() {
@@ -60,7 +72,7 @@ function windowScroll() {
   const currentHeight = (luxy.wapperOffset || 0 as number);
 
 
-  if (store.isScrolling && (Math.abs(currentHeight - store.prevHeight) > 0.5)) {
+  if ((Math.abs(currentHeight - store.prevHeight) > 0.5)) {
 
     const deltaRot = new Quaternion().setFromEuler(
       new Euler(
@@ -78,86 +90,48 @@ function windowScroll() {
   store.prevHeight = currentHeight;
 }
 
-function releaseTouch() {
-  const container = store.container as HTMLElement;
-  container.style.pointerEvents = "none";
-  performTouchScroll();
-  container.style.pointerEvents = "initial";
-}
 
 
 function setupEventListeners() {
+
   const canvas = store.canvas;
   if (!canvas) return;
 
-  // alert('setup')
 
-  canvas.addEventListener("mousedown", () => {
-    store.isDragging = true;
-    store.isScrolling = false;
+  canvas.addEventListener("mousedown", (evt: MouseEvent) => {
+    dragState.status = 'DRAG';
+    dragState.initial = new Vector2(evt.offsetX, evt.offsetY);
+    dragState.originalRotation = store.model?.quaternion || new Quaternion()
   })
 
   canvas.addEventListener("mousemove", (evt: MouseEvent) => {
-    store.deltaMove = {
-      x: evt.offsetX - store.previousMousePosition.x,
-      y: evt.offsetY - store.previousMousePosition.y
-    };
+    if (dragState.status !== 'DRAG') return;    
+    dragState.current = new Vector2(evt.offsetX, evt.offsetY);
 
-    if (store.isDragging) {
-      const deltaRotation = new Quaternion().setFromEuler(
-        new Euler(0, toRadians(store.deltaMove.x * 0.5), 0, "XYZ")
-      );
+    const diff = new Vector2();
+    diff.subVectors(dragState.current, dragState.initial);
 
-      const bottle = store.model as Object3D;
+    diff.multiplyScalar(0.3);
 
-      bottle.quaternion.multiplyQuaternions(deltaRotation, bottle.quaternion);
-    }
-    store.previousMousePosition = { x: evt.offsetX, y: evt.offsetY }
+    const deltaRotation = new Quaternion().setFromEuler(
+      new Euler(0, toRadians(diff.x), 0, "XYZ")
+    );
+
+    const bottle = store.model as Object3D;
+
+    const newRotation = new Quaternion();
+    newRotation.multiplyQuaternions(deltaRotation, dragState.originalRotation);
+
+    bottle.setRotationFromQuaternion(newRotation);
+    dragState.initial = new Vector2(evt.offsetX, evt.offsetY)
+
   });
 
-  // canvas.addEventListener("touchstart", (evt: TouchEvent) => {
-  //   store.previousMousePosition = {
-  //     x: evt.touches[0].clientX,
-  //     y: evt.touches[0].clientY
-  //   }
-  //   store.isDragging = true;
-  //   store.startTouch = {
-  //     x: evt.touches[0].clientX,
-  //     y: evt.touches[0].clientY
-  //   }
-  // })
-
-  // canvas.addEventListener("touchmove", (evt: TouchEvent) => {
-  //   store.deltaMove = {
-  //     x: evt.touches[0].clientX - store.previousMousePosition.x,
-  //     y: evt.touches[0].clientY - store.previousMousePosition.y
-  //   }
-
-  //   store.moveTouch = {
-  //     x: evt.touches[0].clientX,
-  //     y: evt.touches[0].clientY
-  //   }
-
-  //   if (Math.abs(store.moveTouch.x - store.moveTouch.y) > 50) {
-  //     releaseTouch()
-  //   }
-
-  //   store.previousMousePosition = {
-  //     x: evt.touches[0].clientX,
-  //     y: evt.touches[0].clientY
-  //   }
-  // })
 
   window.addEventListener('mouseup', () => {
-    store.isDragging = false;
-    store.isScrolling = true;
+    dragState.status = 'NONE'
   });
 
-  // window.addEventListener("touchend", () => {
-  //   store.previousMousePosition = { ...store.deltaMove };
-  //   store.isDragging = false;
-
-  // })
 }
 
 
