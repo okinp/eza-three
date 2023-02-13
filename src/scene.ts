@@ -276,7 +276,10 @@ export function init() {
 
   store.container = document.getElementById(CONTAINER_ID) || undefined;
 
-  const bottleName = store.container?.dataset.type || 'lagernew';
+  const bottleName = store.container?.dataset.file || 'lagernew';
+  console.log(store.container?.dataset);
+  // debugger;
+  alert(bottleName);
 
   store.scene = new Scene();
 

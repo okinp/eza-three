@@ -1,5 +1,5 @@
-import './style.scss';
-import { init, animate } from "./scene";
+import '../../style.scss';
+import { init, animate } from "../../scene";
 
 
 window.addEventListener('DOMContentLoaded', () => {
