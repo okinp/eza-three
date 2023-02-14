@@ -1,8 +1,7 @@
 import GUI from 'lil-gui'
 import { MeshPhysicalMaterial } from 'three';
 import store from "./store";
-// import type { IStore } from "./interfaces"; 
-// import { Color } from "three";
+
 
 interface PhysicalMaterialParams {
     attenuationColor: number,

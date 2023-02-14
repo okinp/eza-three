@@ -1,4 +1,6 @@
-function resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer, camera: THREE.PerspectiveCamera) {
+import { PerspectiveCamera, WebGLRenderer } from "three";
+
+export function resizeRendererToDisplaySize(renderer: WebGLRenderer, camera: PerspectiveCamera) {
   return function () {
     console.log("resize observer called")
     const canvas = renderer.domElement;
@@ -11,7 +13,7 @@ function resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer, camera: THRE
 };
 
 
-export function observeResize(renderer: THREE.WebGLRenderer, camera: THREE.PerspectiveCamera) {
+export function observeResize(renderer: WebGLRenderer, camera: PerspectiveCamera) {
   console.log("resize observer setup")
   const resizeObserver = new ResizeObserver(resizeRendererToDisplaySize(renderer, camera));
   resizeObserver.observe(renderer.domElement, { box: 'border-box' });
