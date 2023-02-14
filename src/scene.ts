@@ -21,6 +21,9 @@ import {
   MeshPhysicalMaterial,
   sRGBEncoding,
   Vector2,
+  ShapeGeometry,
+  Box3,
+  Vector3,
 } from 'three';
 
 import { setupGui } from './gui';
@@ -31,7 +34,7 @@ import { setupGui } from './gui';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
-// import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 
 import store from "./store";
 
@@ -67,9 +70,15 @@ const dragState: DragState = {
   originalRotation: new Quaternion()
 }
 
+let initMesh1Position  = 0;
+let initMesh2Position = 0;
+
 function windowScroll() {
   // @ts-ignore
   const currentHeight = (luxy.wapperOffset || 0 as number);
+
+  (word1Mesh as Mesh).position.x = initMesh1Position - ( currentHeight / 50 );
+  (word2Mesh as Mesh).position.x = initMesh2Position + ( currentHeight / 50 );
 
 
   if ((Math.abs(currentHeight - store.prevHeight) > 0.5)) {
@@ -262,6 +271,9 @@ async function loadEnvMap() {
   // }
 }
 
+let bottleName ='';
+let word1Mesh: Mesh | undefined = undefined;
+let word2Mesh: Mesh | undefined = undefined;
 
 function handleOnLoaded() {
   console.log("loaded");
@@ -272,11 +284,91 @@ function handleOnLoaded() {
 
 }
 
+async function setupScrollingText(scene: Scene){
+
+
+  const fontLoader = new FontLoader();
+
+  const font = await fontLoader.loadAsync("/fonts/Silvania_Regular.json")
+
+  const text : { word1: string, word2: string } = {
+    word1: "",
+    word2: ""
+  }
+
+  switch(bottleName){
+    case("finelager"):
+      text.word1 = "FINE";
+      text.word2 ="LAGER";
+      break;
+    case("alcoholfree"):
+      text.word1 = "ALCOHOL";
+      text.word2 = "FREE";
+      break;
+    case("premiumpilsener"):
+      text.word1 = "PREMIUM";
+      text.word2 = "PILSENER";
+      break;
+    default:
+      text.word1 = "FINE";
+      text.word2 ="LAGER";
+  };
+
+  const wordMaterial = new MeshBasicMaterial( {
+    color: 0xf2f2f2,
+    transparent: true,
+    opacity: 0.2,
+    side: DoubleSide
+  } );
+
+
+  const shapeWord1 = font.generateShapes(text.word1, 2.5);
+  const shapeWord2 = font.generateShapes(text.word2, 2.5);
+  const geometryWord1 = new ShapeGeometry(shapeWord1);
+  geometryWord1.computeBoundingBox();
+  const geometryWord2 = new ShapeGeometry(shapeWord2);
+  geometryWord2.computeBoundingBox();
+
+  const xMid1 = Math.abs ( (geometryWord1.boundingBox as Box3).max.x - (geometryWord1.boundingBox as Box3).min.x ) / 2;
+  const xMid2 = Math.abs ( (geometryWord2.boundingBox as Box3).max.x - (geometryWord2.boundingBox as Box3).min.x ) / 2;
+  
+
+  geometryWord1.translate(0,1,0);
+  geometryWord2.translate(0,-2.5, 0);
+  word1Mesh = new Mesh(geometryWord1, wordMaterial);
+  word2Mesh = new Mesh(geometryWord2, wordMaterial);
+
+  const mql = window.matchMedia('(min-width: 1024px)');
+
+  initMesh1Position = word1Mesh.position.x ;
+  initMesh2Position = word2Mesh.position.x;
+
+  function screenTest(e: MediaQueryListEvent){
+    const mesh1 = word1Mesh as Mesh;
+    const mesh2 = word2Mesh as Mesh;
+    mesh1.position.z = -5;
+    mesh2.position.z = -5;
+    if (e.matches){
+      mesh1.position.x = - xMid1 -2;
+      mesh2.position.x = -2 ;
+    } else {
+      mesh1.position.x = - xMid1;
+      mesh2.position.x = -xMid2;
+    }
+  }
+
+  mql.addEventListener('change', screenTest)
+
+  scene.add( word1Mesh );
+  scene.add( word2Mesh);
+
+}
+
 export function init() {
 
   store.container = document.getElementById(CONTAINER_ID) || undefined;
 
-  const bottleName = store.container?.dataset.type || 'lagernew';
+  bottleName = store.container?.dataset.type || 'finelager';
 
   store.scene = new Scene();
 
@@ -284,7 +376,7 @@ export function init() {
 
   if (!success) return;
 
-  setupLights(store.scene);
+  // setupLights(store.scene);
   setupCamera();
 
   // const scene = new Scene();
@@ -346,8 +438,11 @@ export function init() {
       scene.environment = HDRImap;
       (store.bottleMaterial as MeshPhysicalMaterial).envMap = HDRImap;
       HDRImap.dispose()
-      pmremGenerator.dispose()
-    }).then(handleOnLoaded)
+      pmremGenerator.dispose();
+      return scene;
+      setupScrollingText
+    }).then(setupScrollingText).
+    then(handleOnLoaded)
     // .then(() => setupGui());
 
 
