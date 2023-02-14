@@ -23,7 +23,7 @@ import {
   Vector2,
   ShapeGeometry,
   Box3,
-  Vector3,
+  // Vector3,
 } from 'three';
 
 import { setupGui } from './gui';
@@ -191,63 +191,63 @@ function createCircleMesh() {
   return circleMesh
 }
 
-function setupLights(scene: Scene) {
-  const ambientLight = new AmbientLight(0xffffff, 10);
-  store.ambientLight = ambientLight;
+// function setupLights(scene: Scene) {
+//   const ambientLight = new AmbientLight(0xffffff, 10);
+//   store.ambientLight = ambientLight;
 
-  const pointLight1 = new PointLight("#ffffff", 1.2, 100);
-  pointLight1.position.set(-2, 3, 3);
-  pointLight1.castShadow = true
-  pointLight1.shadow.radius = 4
-  pointLight1.shadow.camera.near = 0.5
-  pointLight1.shadow.camera.far = 4000
-  pointLight1.shadow.mapSize.width = 2048
-  pointLight1.shadow.mapSize.height = 2048
-  store.pointLight1 = pointLight1;
+//   const pointLight1 = new PointLight("#ffffff", 1.2, 100);
+//   pointLight1.position.set(-2, 3, 3);
+//   pointLight1.castShadow = true
+//   pointLight1.shadow.radius = 4
+//   pointLight1.shadow.camera.near = 0.5
+//   pointLight1.shadow.camera.far = 4000
+//   pointLight1.shadow.mapSize.width = 2048
+//   pointLight1.shadow.mapSize.height = 2048
+//   store.pointLight1 = pointLight1;
 
 
-  const pointLight2 = new PointLight(0xffffff, 25, 50);
-  pointLight2.position.set(-5, -2, -10);
-  store.pointLight2 = pointLight2;
+//   const pointLight2 = new PointLight(0xffffff, 25, 50);
+//   pointLight2.position.set(-5, -2, -10);
+//   store.pointLight2 = pointLight2;
 
-  const pointLight3 = new PointLight(0xffffff, 25, 50);
-  pointLight3.position.set(0, -5, -5);
-  store.pointLight3 = pointLight3;
+//   const pointLight3 = new PointLight(0xffffff, 25, 50);
+//   pointLight3.position.set(0, -5, -5);
+//   store.pointLight3 = pointLight3;
 
-  const directionalLight = new DirectionalLight(0xffffff, 12);
-  directionalLight.position.set(0, 0, 5);
-  directionalLight.target.position.set(0, 0, 0);
-  store.directionalLight = directionalLight;
+//   const directionalLight = new DirectionalLight(0xffffff, 12);
+//   directionalLight.position.set(0, 0, 5);
+//   directionalLight.target.position.set(0, 0, 0);
+//   store.directionalLight = directionalLight;
 
-  const spotLight = new SpotLight(0xffffff, 5);
-  spotLight.position.set(25, 50, 25);
-  spotLight.angle = Math.PI / 6;
-  spotLight.penumbra = 1;
-  spotLight.decay = 2;
-  spotLight.distance = 100;
-  // spotLight.map = textures[ 'disturb.jpg' ];
+//   const spotLight = new SpotLight(0xffffff, 5);
+//   spotLight.position.set(25, 50, 25);
+//   spotLight.angle = Math.PI / 6;
+//   spotLight.penumbra = 1;
+//   spotLight.decay = 2;
+//   spotLight.distance = 100;
+//   // spotLight.map = textures[ 'disturb.jpg' ];
 
-  spotLight.castShadow = true;
-  spotLight.shadow.mapSize.width = 1024;
-  spotLight.shadow.mapSize.height = 1024;
-  spotLight.shadow.camera.near = 10;
-  spotLight.shadow.camera.far = 200;
-  spotLight.shadow.focus = 1;
-  scene.add(spotLight);
+//   spotLight.castShadow = true;
+//   spotLight.shadow.mapSize.width = 1024;
+//   spotLight.shadow.mapSize.height = 1024;
+//   spotLight.shadow.camera.near = 10;
+//   spotLight.shadow.camera.far = 200;
+//   spotLight.shadow.focus = 1;
+//   scene.add(spotLight);
 
-  const spotLightHelper = new SpotLightHelper(spotLight);
-  spotLightHelper.color = 0x000000;
-  scene.add(spotLightHelper);
-  store.spotLight = spotLight;
-  store.spotLightHelper = spotLightHelper;
+//   const spotLightHelper = new SpotLightHelper(spotLight);
+//   spotLightHelper.color = 0x000000;
+//   scene.add(spotLightHelper);
+//   store.spotLight = spotLight;
+//   store.spotLightHelper = spotLightHelper;
 
-  scene.add(pointLight1);
-  scene.add(pointLight2);
-  scene.add(pointLight3);
-  scene.add(directionalLight);
-  scene.add(ambientLight);
+//   scene.add(pointLight1);
+//   scene.add(pointLight2);
+//   scene.add(pointLight3);
+//   scene.add(directionalLight);
+//   scene.add(ambientLight);
 
-}
+// }
 
 
 async function loadEnvMap() {
