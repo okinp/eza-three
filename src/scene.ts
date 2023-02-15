@@ -23,6 +23,7 @@ import {
   Vector2,
   ShapeGeometry,
   Box3,
+  ColorManagement,
   // Vector3,
 } from 'three';
 
@@ -150,6 +151,8 @@ function setupRenderer() {
   const canvas = (document.querySelector(`canvas#${CANVAS_ID}`) as HTMLElement);
   if (!canvas) return false;
   store.canvas = canvas;
+  ColorManagement.enabled = true;
+  ColorManagement.legacyMode = false;
   const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true })
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.shadowMap.enabled = true;
