@@ -1,3 +1,4 @@
+//@ts-nocheck
 import GUI from 'lil-gui'
 import { MeshPhysicalMaterial } from 'three';
 import store from "./store";

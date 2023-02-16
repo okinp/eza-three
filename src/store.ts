@@ -16,6 +16,7 @@ import {
 
 export interface IStore {
   rootObject: Object3D,
+  bottleObject: Object3D,
   materials: {
     word: MeshBasicMaterial,
     circle: MeshBasicMaterial,
