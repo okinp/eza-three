@@ -71,7 +71,7 @@ export function init() {
   scene.add(rootObject);
 
   Promise.all([
-    loadGLTFModel(`/glb/${bottleName}-new.glb`),
+    loadGLTFModel(`/glb/${bottleName}.glb`),
     loadFont("/fonts/Silvania_Regular.json"),
     loadEnvMapToScene(`/envmap/studio_country_hall_1k.hdr`, scene, renderer),
   ]).then(([gltf, font]) => {
