@@ -55,7 +55,7 @@ export function init() {
     return;
   }
 
-  bottleName = container.dataset.type || "finelager";
+  bottleName = container.dataset.file || "finelager";
 
   const rootObject = new Object3D();
   const bottleObject = new Object3D();
