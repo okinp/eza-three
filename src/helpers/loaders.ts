@@ -1,6 +1,7 @@
-import { Texture, TextureEncoding, TextureLoader } from "three";
+import { HalfFloatType, PMREMGenerator, Scene, Texture, TextureEncoding, TextureLoader, WebGLRenderer } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 
 interface TextureParamsType {
   url: string;
@@ -41,4 +42,22 @@ export async function loadGLTFModel(url: string) {
 export async function loadFont(url: string) {
   const fontLoader = new FontLoader();
   return await fontLoader.loadAsync(url);
+}
+
+export async function loadEnvMapToScene(
+  url: string,
+  scene: Scene,
+  renderer: WebGLRenderer
+) {
+  const envLoader = new RGBELoader();
+  envLoader.setDataType(HalfFloatType);
+  const pmremGenerator = new PMREMGenerator(renderer);
+  pmremGenerator.compileEquirectangularShader();
+
+  const env = await envLoader.loadAsync(url);
+  const HDRImap = pmremGenerator.fromEquirectangular(env).texture;
+
+  scene.environment = HDRImap;
+  HDRImap.dispose();
+  pmremGenerator.dispose();
 }

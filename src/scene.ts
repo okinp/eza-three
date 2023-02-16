@@ -1,199 +1,163 @@
-import {
-  CircleGeometry,
-  DoubleSide,
-  Euler,
-  Mesh,
-  MeshBasicMaterial,
-  Object3D,
-  Quaternion,
-  Scene,
-  MeshPhysicalMaterial,
-} from 'three';
+import { Euler, Quaternion, Object3D, Scene, MeshPhysicalMaterial, Mesh, Clock } from "three";
 
-import { setupGui } from './gui';
+import { createCamera, createRenderer, loadFont, loadEnvMapToScene, loadGLTFModel, observeResize, enableDragToRotate, getScrollCallback, toRadians } from "./helpers";
 
 
+import { createCircleMesh, createWordMeshes } from "./helpers/meshes";
+import state from "./store";
+
+const CONTAINER_ID = 'CanvasFrame';
+const CANVAS_ID = 'scene';
 
 
+let bottleName = "finelager";
 
+let initWordAx = 0;
+let initWordBx = 0;
 
+const windowScroll = getScrollCallback((currentScroll, previousScroll) => {
+  if (state.store){
+    state.store.meshes.wordA.position.x  = initWordAx - currentScroll / 50;
+    state.store.meshes.wordB.position.x  = initWordBx + currentScroll / 50;
+    const deltaRot = new Quaternion().setFromEuler(
+      new Euler(
+        0,
+        toRadians((currentScroll - previousScroll) * 0.5),
+        0,
+        "XYZ"
+      )
+    );
 
-import store from "./store";
-
-import { toRadians, getScrollCallback  } from './helpers/callbacks';
-
-import { createTexturesAndMaterials } from "./materials"
-
-// import Stats from 'three/examples/jsm/libs/stats.module'
-
-import { observeResize } from './helpers/responsiveness';
-
-const CANVAS_ID = 'scene'
-
-const CONTAINER_ID = "CanvasFrame";
-
-
-
-
-
-function setup(){
-
-
-}
-
-
-const rotateOnScroll = getScrollCallback((prev: number, cur: number) => {
-  const deltaRot = new Quaternion().setFromEuler(
-    new Euler(
-      0,
-      toRadians((cur - prev) * 0.5),
-      0,
-      "XYZ"
-    )
-  );
-
-  const bottle = store.model as Object3D;
-  bottle.quaternion.multiplyQuaternions(deltaRot, bottle.quaternion);
+    const bottle = state.store.bottleObject;
+    bottle.quaternion.multiplyQuaternions(deltaRot, bottle.quaternion);
+  }
 })
 
 
+export function init(){
 
+  const container = document.getElementById(CONTAINER_ID)
+  const canvas = document.getElementById(CANVAS_ID);
 
-
-
-
-function createCircleMesh() {
-  const circleGeometry = new CircleGeometry(8.5, 512);
-  const circleMaterial = new MeshBasicMaterial({
-    color: 0xffff00,
-    opacity: 0.2,
-    transparent: true,
-    side: DoubleSide,
-    depthWrite: false,
-  })
-  const circleMesh = new Mesh(circleGeometry, circleMaterial);
-  circleMesh.position.set(0, 0, -25);
-  return circleMesh
-}
-
-
-
-
-
-
-function handleOnLoaded() {
-  console.log("loaded");
-  store.isReady = true;
-  setupEventListeners();
-  
-  setupGui();
-
-}
-
-export function init() {
-
-  store.container = document.getElementById(CONTAINER_ID) || undefined;
-
-  const bottleName = store.container?.dataset.file || 'lagernew';
-  console.log(store.container?.dataset);
-  // debugger;
-  alert(bottleName);
-
-  store.scene = new Scene();
-
-  const success = setupRenderer();
-
-  if (!success) return;
-
-  setupLights(store.scene);
-  setupCamera();
-
-  // const scene = new Scene();
-  // store.scene = scene;
-
-  
-  
-
-  // setupEventListeners();
-
-  if (store.renderer && store.camera) {
-    observeResize(store.renderer, store.camera);
+  if (!container || !canvas ){
+    return;
   }
 
+  bottleName = container.dataset.type || "finelager";
+
+  const rootObject = new Object3D();
+  const bottleObject = new Object3D();
+  const domNodes = { canvas, container };
+  const renderer = createRenderer(canvas);
+  const camera = createCamera(canvas);
+  observeResize(renderer, camera);
+
+  const clock = new Clock();
 
 
-  const modelLoader = new GLTFLoader();
+  const scene = new Scene();
 
-  Promise.all([createTexturesAndMaterials(), modelLoader.loadAsync(`/glb/${bottleName}.glb`), loadEnvMap()])
-    .then(([{ }, gltf, { pmremGenerator, HDRImap }]) => {
-      store.container?.classList.remove("loading");
-      store.circleMesh = createCircleMesh();
-      const scene = store.scene as Scene;
-
-      scene.add(store.circleMesh);
-      const parentObject = new Object3D();
-      const bottleMesh = gltf.scene.children[0];
-      const capMesh = gltf.scene.children[1];
-      const labelTopMesh = gltf.scene.children[2];
-      const labelFrontMesh = gltf.scene.children[4];
-      const bottleInnerMesh = gltf.scene.children[3];
-      const labelBackMesh = gltf.scene.children[5];
-
-      const bottleMaterial = ((bottleMesh as Mesh).material as MeshPhysicalMaterial);
-      bottleMaterial.depthTest = true;
-      bottleMaterial.depthWrite = true;
-      const liquidMaterial = ((bottleInnerMesh as Mesh).material as MeshPhysicalMaterial);
-      liquidMaterial.depthTest = true;
-      liquidMaterial.depthWrite = true;
-
-      store.bottleMaterial = bottleMaterial;
-      store.liquidMaterial = liquidMaterial;
+  scene.add(rootObject);
 
 
-      parentObject.add(bottleMesh);
-      parentObject.add(capMesh);
-      parentObject.add(labelTopMesh);
-      parentObject.add(bottleInnerMesh);
-      parentObject.add(labelFrontMesh);
-      parentObject.add(labelBackMesh);
-      parentObject.position.set(0, 0.5, 0);
-      parentObject.scale.set(2, 2, 2);
-      parentObject.rotation.set(0, 0, Math.PI / 9);
-      store.model = parentObject;
-
-      scene.add(parentObject);
 
 
-      scene.environment = HDRImap;
-      (store.bottleMaterial as MeshPhysicalMaterial).envMap = HDRImap;
-      HDRImap.dispose()
-      pmremGenerator.dispose()
-    }).then(handleOnLoaded)
-    // .then(() => setupGui());
+
+  Promise.all([ loadGLTFModel(`/glb/${bottleName}.glb`), loadFont("/fonts/Silvania_Regular.json"), loadEnvMapToScene(`/envmap/studio_country_hall_1k.hdr`, scene, renderer)])
+    .then(([gltf, font ]) => {
+
+      container.classList.remove("loading");
+      const { circleMesh, circleMaterial } = createCircleMesh();
+
+      const { word1Mesh, word2Mesh, wordMaterial } = createWordMeshes(font, bottleName);
+
+      initWordAx = word1Mesh.position.x;
+      initWordBx = word2Mesh.position.x;
+
+      const backgroundObject = new Object3D();
+      backgroundObject.add(circleMesh, word1Mesh, word2Mesh);
+      backgroundObject.position.y = 0;
+
+      const bottleMesh = gltf.scene.children[0] as Mesh;
+      const bottleMaterial = bottleMesh.material as MeshPhysicalMaterial;
+
+      const capMesh = gltf.scene.children[1] as Mesh;
+      const capMaterial = capMesh.material as MeshPhysicalMaterial;
+
+      const topLabelMesh = gltf.scene.children[2] as Mesh;
+      const topLabelMaterial = topLabelMesh.material as MeshPhysicalMaterial;
+
+      const liquidMesh = gltf.scene.children[3] as Mesh;
+      const liquidMaterial = liquidMesh.material as MeshPhysicalMaterial;
+
+      const frontLabelMesh = gltf.scene.children[4] as Mesh;
+      const frontLabelMaterial = frontLabelMesh.material as MeshPhysicalMaterial;
+
+      const backLabelMesh = gltf.scene.children[5] as Mesh;
+      const backLabelMaterial = backLabelMesh.material as MeshPhysicalMaterial;
+
+      bottleObject.add(liquidMesh, bottleMesh, capMesh, topLabelMesh, frontLabelMesh, backLabelMesh);
+      bottleObject.position.set(0,0.5,0);
+      bottleObject.scale.set(2,2,2);
+      bottleObject.rotation.set(0,0, Math.PI / 9);
+
+      rootObject.add(backgroundObject);
+      rootObject.add(bottleObject);
+      rootObject.position.y = 1;
+
+      state.store = {
+        rootObject,
+        bottleObject,
+        materials: {
+          word: wordMaterial,
+          circle: circleMaterial,
+          bottle: bottleMaterial,
+          liquid: liquidMaterial,
+          frontLabel: frontLabelMaterial,
+          backLabel: backLabelMaterial,
+          topLabel: topLabelMaterial,
+          cap: capMaterial
+        },
+        domNodes,
+        scene,
+        renderer,
+        camera,
+        lights: {
+          ambient: undefined,
+          point: [],
+          spot: [],
+          directional: []
+        },
+        lightHelpers: {
+          spot: [],
+          point: [],
+          directional: []
+        },
+        meshes: {
+          cap: capMesh,
+          circle: circleMesh,
+          bottle: bottleMesh,
+          liquid: liquidMesh,
+          topLabel: topLabelMesh,
+          frontLabel: frontLabelMesh,
+          backLabel: backLabelMesh,
+          wordA: word1Mesh,
+          wordB: word2Mesh,
+        },
+        isReady: true,
+        clock
+      }
+      enableDragToRotate(state.store.domNodes.canvas, state.store.bottleObject);
 
 
-  // ===== 📈 STATS & CLOCK =====
-  // store.clock = new Clock()
-  // store.stats = Stats()
-  document.body.appendChild(store.stats.dom)
 
-
+    })
 }
 
-export function animate() {
+export function animate(){
   requestAnimationFrame(animate)
-
-  // store?.stats && store.stats.update()
-
-  store?.pointLightHelper1 && store.pointLightHelper1.update();
-
-  if (store.scene && store.camera && store.renderer) {
-    store.renderer.render(store.scene, store.camera)
+  if (state.store ){
+    state.store.renderer.render(state.store.scene, state.store.camera);
+    windowScroll()
   }
-
-  if (store.isReady){
-    rotateOnScroll()
-    // windowScroll();
-  }
-
 }

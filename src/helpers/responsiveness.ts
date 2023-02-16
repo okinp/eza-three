@@ -14,7 +14,6 @@ export function resizeRendererToDisplaySize(renderer: WebGLRenderer, camera: Per
 
 
 export function observeResize(renderer: WebGLRenderer, camera: PerspectiveCamera) {
-  console.log("resize observer setup")
   const resizeObserver = new ResizeObserver(resizeRendererToDisplaySize(renderer, camera));
   resizeObserver.observe(renderer.domElement, { box: 'border-box' });
 }

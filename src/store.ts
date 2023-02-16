@@ -11,32 +11,48 @@ import {
   PointLightHelper,
   SpotLightHelper,
   DirectionalLightHelper,
+  MeshBasicMaterial,
 } from "three";
 
 export interface IStore {
-  rootObject: Object3D;
+  rootObject: Object3D,
   materials: {
-    bottle: MeshPhysicalMaterial;
-    liquid: MeshPhysicalMaterial;
-  };
+    word: MeshBasicMaterial,
+    circle: MeshBasicMaterial,
+    bottle: MeshPhysicalMaterial,
+    liquid: MeshPhysicalMaterial,
+    frontLabel: MeshPhysicalMaterial,
+    backLabel: MeshPhysicalMaterial,
+    topLabel: MeshPhysicalMaterial,
+    cap: MeshPhysicalMaterial
+  },
   domNodes: {
-    canvas: HTMLElement;
-    container: HTMLElement;
+    canvas: HTMLElement,
+    container: HTMLElement,
   };
-  scene: Scene;
-  renderer: WebGLRenderer;
-  camera: PerspectiveCamera;
-  lights: ILights;
+  scene: Scene,
+  renderer: WebGLRenderer,
+  camera: PerspectiveCamera,
+  lights: ILights,
   lightHelpers: {
-    spot: SpotLightHelper[];
-    point: PointLightHelper[];
-    directional: DirectionalLightHelper[];
-  };
+    spot: SpotLightHelper[],
+    point: PointLightHelper[],
+    directional: DirectionalLightHelper[]
+  },
   meshes: {
-    circle: Mesh;
-  };
-  isReady: boolean;
-  clock: Clock;
+    cap: Mesh,
+    circle: Mesh,
+    bottle: Mesh,
+    liquid: Mesh,
+    topLabel: Mesh,
+    frontLabel: Mesh,
+    backLabel: Mesh,
+    wordA: Mesh,
+    wordB: Mesh
+
+  },
+  isReady: boolean,
+  clock: Clock
 }
 
 interface State {

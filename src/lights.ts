@@ -2,7 +2,7 @@ import { AmbientLight, PointLight, SpotLight, DirectionalLight, Scene, SpotLight
 
 
 export interface ILights {
-    ambient: AmbientLight,
+    ambient: AmbientLight | undefined,
     point: PointLight[]
     spot: SpotLight[],
     directional: DirectionalLight[]
