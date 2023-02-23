@@ -147,9 +147,9 @@ export async function init() : Promise<boolean> {
       rootObject.add(bottleObject);
       rootObject.position.y = 1;
   
-      const composer = new EffectComposer(renderer);
-      composer.addPass(new RenderPass(scene, camera));
-      composer.addPass(new EffectPass(camera, new BloomEffect()));
+      // const composer = new EffectComposer(renderer);
+      // composer.addPass(new RenderPass(scene, camera));
+      // composer.addPass(new EffectPass(camera, new BloomEffect()));
 
       state.store = {
         rootObject,
@@ -166,7 +166,7 @@ export async function init() : Promise<boolean> {
         scene,
         renderer,
         camera,
-        composer,
+        composer: undefined,
         lights: {
           ambient: undefined,
           point: [],
@@ -205,8 +205,8 @@ export async function init() : Promise<boolean> {
 export function animate() {
   requestAnimationFrame(animate);
   if (state.store) {
-    // state.store.renderer.render(state.store.scene, state.store.camera);
-    state.store.composer.render();
+    state.store.renderer.render(state.store.scene, state.store.camera);
+    // state.store.composer.render();
     windowScroll();
   }
 }
