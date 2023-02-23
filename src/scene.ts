@@ -31,7 +31,6 @@ import state from "./store";
 const containerId = "CanvasFrame";
 const canvasId = "scene";
 
-let bottleName = "fine_lager";
 
 
 const windowScroll = getScrollCallback((currentScroll, previousScroll) => {
@@ -60,9 +59,7 @@ export async function init() : Promise<boolean> {
     return false;
   }
 
-  bottleName = container.dataset.file ??  "finelager";
-  bottleName = "Lager_GLB_opt";
-  bottleName = "alcoholfree";
+  const bottleName = container.dataset.file ??  "finelager";
 
 
   const rootObject = new Object3D();
