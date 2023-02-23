@@ -92,6 +92,8 @@ export function init() {
 
     const bottleMesh = gltf.scene.children[0] as Mesh;
     const bottleMaterial = bottleMesh.material as MeshPhysicalMaterial;
+    bottleMaterial.alphaMap = null;
+    bottleMaterial.map = null;
 
     const capMesh = gltf.scene.children[1] as Mesh;
     const capMaterial = capMesh.material as MeshPhysicalMaterial;
@@ -101,6 +103,8 @@ export function init() {
 
     const liquidMesh = gltf.scene.children[3] as Mesh;
     const liquidMaterial = liquidMesh.material as MeshPhysicalMaterial;
+    liquidMaterial.alphaMap = null;
+    liquidMaterial.map = null;
 
     const frontLabelMesh = gltf.scene.children[4] as Mesh;
     const frontLabelMaterial = frontLabelMesh.material as MeshPhysicalMaterial;
