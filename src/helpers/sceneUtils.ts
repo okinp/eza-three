@@ -11,7 +11,7 @@ import {
 export function createRenderer(canvas: HTMLElement) {
   ColorManagement.enabled = true;
   ColorManagement.legacyMode = false;
-  const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true });
+  const renderer = new WebGLRenderer({ canvas, powerPreference: "high-performance", antialias: false, alpha: true, stencil: false, depth: false });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.shadowMap.type = PCFSoftShadowMap
   renderer.shadowMap.enabled = true;

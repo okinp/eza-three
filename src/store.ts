@@ -1,5 +1,4 @@
 import type { ILights } from "./lights";
-
 import {
   Clock,
   Mesh,
@@ -11,53 +10,51 @@ import {
   PointLightHelper,
   SpotLightHelper,
   DirectionalLightHelper,
-  MeshBasicMaterial,
 } from "three";
+import { EffectComposer } from "postprocessing";
 
-export interface IStore {
-  rootObject: Object3D,
-  bottleObject: Object3D,
+export interface Store {
+  rootObject: Object3D;
+  bottleObject: Object3D;
   materials: {
-    word: MeshBasicMaterial,
-    circle: MeshBasicMaterial,
-    bottle: MeshPhysicalMaterial,
-    liquid: MeshPhysicalMaterial,
-    frontLabel: MeshPhysicalMaterial,
-    backLabel: MeshPhysicalMaterial,
-    topLabel: MeshPhysicalMaterial,
-    cap: MeshPhysicalMaterial
-  },
-  domNodes: {
-    canvas: HTMLElement,
-    container: HTMLElement,
+    bottle: MeshPhysicalMaterial;
+    cap: MeshPhysicalMaterial;
+    topLabel: MeshPhysicalMaterial;
+    backLabel: MeshPhysicalMaterial;
+    frontLabel: MeshPhysicalMaterial;
+    liquid: MeshPhysicalMaterial;
+    water?: MeshPhysicalMaterial;
   };
-  scene: Scene,
-  renderer: WebGLRenderer,
-  camera: PerspectiveCamera,
-  lights: ILights,
+  domNodes: {
+    canvas: HTMLElement;
+    container: HTMLElement;
+  };
+  composer: EffectComposer;
+  scene: Scene;
+  renderer: WebGLRenderer;
+  camera: PerspectiveCamera;
+  lights: ILights;
   lightHelpers: {
-    spot: SpotLightHelper[],
-    point: PointLightHelper[],
-    directional: DirectionalLightHelper[]
-  },
+    spot: SpotLightHelper[];
+    point: PointLightHelper[];
+    directional: DirectionalLightHelper[];
+  };
   meshes: {
-    cap: Mesh,
-    circle: Mesh,
-    bottle: Mesh,
-    liquid: Mesh,
-    topLabel: Mesh,
-    frontLabel: Mesh,
-    backLabel: Mesh,
-    wordA: Mesh,
-    wordB: Mesh
+    bottle: Mesh;
+    cap: Mesh;
+    topLabel: Mesh;
+    backLabel: Mesh;
+    frontLabel: Mesh;
+    liquid: Mesh;
+    water?: Mesh;
+  };
+  isReady: boolean;
 
-  },
-  isReady: boolean,
-  clock: Clock
+  clock: Clock;
 }
 
 interface State {
-  store: IStore | undefined;
+  store: Store | undefined;
 }
 
 const state: State = {

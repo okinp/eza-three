@@ -2,6 +2,7 @@ import { HalfFloatType, PMREMGenerator, Scene, Texture, TextureEncoding, Texture
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 
 interface TextureParamsType {
   url: string;
@@ -34,8 +35,15 @@ export async function loadTextures(textureParams: TextureParamsType[]) {
   }, new Map<string, Texture>());
 }
 
-export async function loadGLTFModel(url: string) {
+export async function loadGLTFModel(url: string, useDraco: boolean = false) {
+  
   const gltfLoader = new GLTFLoader();
+  if (useDraco){
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderConfig({ type: 'js' });
+    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+    gltfLoader.setDRACOLoader(dracoLoader);
+  }
   return await gltfLoader.loadAsync(url);
 }
 

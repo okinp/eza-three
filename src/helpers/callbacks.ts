@@ -3,6 +3,7 @@ import { Euler, Quaternion, Object3D, Vector2 } from "three";
 type DragStatus = 'NONE' | 'DRAG';
 
 
+
 interface DragState {
     status: DragStatus;
     initial: Vector2;
@@ -17,9 +18,21 @@ export function toRadians(angle: number) {
 
 export function getScrollCallback(cb: (current: number, previous: number) => void) {
     let previousHeight = 0;
+    const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent) as boolean;
+    if (!isMobile){
+      //@ts-ignore
+      if (window.luxy){
+        //@ts-ignore
+        window.luxy.init({
+          wrapper: '#smooth',
+          wrapperSpeed: 0.065,
+        });
+      }
+
+    }
     return function () {
-        // @ts-ignore
-        const currentHeight = (luxy.wapperOffset || 0 as number);
+        //@ts-ignore
+        const currentHeight = (window.luxy?.wapperOffset ?? 0 );
         if ((Math.abs(currentHeight - previousHeight) > 0.5)) {
             cb(currentHeight, previousHeight);
         }
