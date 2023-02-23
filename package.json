@@ -5,10 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "lint:ts": "tsc --noEmit",
-    "lint:staged": "lint-staged"
+    "build": "tsc && vite build"
   },
   "devDependencies": {
     "@types/node": "^18.13.0",
@@ -29,15 +26,5 @@
   "dependencies": {
     "lil-gui": "^0.18.0",
     "three": "0.148.0"
-  },
-  "lint-staged": {
-    "./src/**/*.ts{,x}": [
-      "eslint --fix",
-      "prettier --write"
-    ]
-  },
-  "simple-git-hooks": {
-    "pre-commit": "npm run lint:staged",
-    "pre-push": "npm run lint:ts"
   }
 }
