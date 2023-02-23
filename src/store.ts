@@ -29,7 +29,7 @@ export interface Store {
     canvas: HTMLElement;
     container: HTMLElement;
   };
-  composer: EffectComposer;
+  composer?: EffectComposer;
   scene: Scene;
   renderer: WebGLRenderer;
   camera: PerspectiveCamera;
