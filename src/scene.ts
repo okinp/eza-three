@@ -66,8 +66,6 @@ export async function init() : Promise<boolean> {
   bottleName = "Lager_GLB_opt";
   bottleName = "premiumpilsener";
 
-  // const wordA = container.dataset.word1 ?? "FINE";
-  // const wordB = container.dataset.word2 ?? "LAGER";
 
   const rootObject = new Object3D();
   const bottleObject = new Object3D();
@@ -89,11 +87,11 @@ export async function init() : Promise<boolean> {
       loadGLTFModel(`${filePath}/glb/${bottleName}.glb`, true),
       loadFont(`${filePath}/fonts/Silvania_Regular.json`),
             loadEnvMapToScene(`${filePath}/envmap/studio_small_08_1k.hdr`, scene, renderer),
-      // loadEnvMapToScene(`${filePath}/envmap/studio_country_hall_1k.hdr`, scene, renderer),
     ]).then(([gltf]) => {
+
+
       container.classList.remove("loading");
-  
-      
+
       const capMesh = gltf.scene.children[1] as Mesh;
       const capMaterial = capMesh.material as MeshPhysicalMaterial;
       
@@ -201,8 +199,6 @@ export async function init() : Promise<boolean> {
 
   return true;
 }
-
-// const store = state.store as IStore;
 
 
 
