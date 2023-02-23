@@ -8,9 +8,6 @@ import {
   Clock
 } from "three";
 
-// import { LayerMaterial, Color, Depth, Fresnel, Noise } from 'lamina/vanilla'
-
-// import { BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
 
 
 import {
@@ -25,7 +22,7 @@ import {
   toRadians,
 } from "./helpers";
 
-// import { createCircleMesh, createWordMeshes } from "./helpers/meshes";
+
 
 
 import { setupGui } from "./gui";
@@ -37,13 +34,10 @@ const canvasId = "scene";
 
 let bottleName = "fine_lager";
 
-// let initWordAx = 0;
-// let initWordBx = 0;
+
 
 const windowScroll = getScrollCallback((currentScroll, previousScroll) => {
   if (state.store) {
-    // state.store.meshes.wordA.position.x = initWordAx - (currentScroll / 50);
-    // state.store.meshes.wordB.position.x = initWordBx + (currentScroll / 50);
 
     const deltaRot = new Quaternion().setFromEuler(
       new Euler(0, toRadians((currentScroll - previousScroll) * 0.5), 0, "XYZ")
@@ -121,24 +115,15 @@ export async function init() : Promise<boolean> {
       const backLabelMaterial = backLabelMesh.material as MeshPhysicalMaterial;
 
 
-      //const { dropletMesh, sample } = createInstancedDroplets(waterDropletMesh, bottleMesh);
-      //sample();
-      //const bottleAndDrops = new Object3D();
-      //bottleAndDrops.add(bottleMesh, dropletMesh);
-      //console.log(dropletMesh.material);
-      //const dropletMaterial = dropletMesh.material as MeshPhysicalMaterial;
-
-      // bottleMesh.scale.set(0.5,0.5,0.5);
       bottleObject.add(
         liquidMesh,
         bottleMesh,
-        //waterMesh,
         capMesh,
         topLabelMesh,
         frontLabelMesh,
         backLabelMesh,
-        // waterDropletMesh
       );
+
       bottleObject.position.set(0, 0.5, 0);
       bottleObject.scale.set(2,2,2);
       bottleObject.rotation.set(0, 0, Math.PI / 9);
