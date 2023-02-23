@@ -55,7 +55,7 @@ export async function init() : Promise<boolean> {
   const word1 = document.getElementById('js-word1');
   const word2 = document.getElementById('js-word2');
 
-  if (!container || !canvas) {
+  if (!container || !canvas || !word1 || !word2 ) {
     return false;
   }
 
