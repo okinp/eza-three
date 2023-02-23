@@ -10,7 +10,7 @@ import {
 
 // import { LayerMaterial, Color, Depth, Fresnel, Noise } from 'lamina/vanilla'
 
-import { BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
+// import { BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
 
 
 import {
