@@ -29,7 +29,7 @@ import state from "./store";
 const CONTAINER_ID = "CanvasFrame";
 const CANVAS_ID = "scene";
 
-let bottleName = "finelager";
+let bottleName = "premiumpilsener";
 
 let initWordAx = 0;
 let initWordBx = 0;
