@@ -33,13 +33,12 @@ const canvasId = "scene";
 
 let bottleName = "fine_lager";
 
-// let initWordAx = 0;
-// let initWordBx = 0;
 
 const windowScroll = getScrollCallback((currentScroll, previousScroll) => {
   if (state.store) {
-    // state.store.meshes.wordA.position.x = initWordAx - (currentScroll / 50);
-    // state.store.meshes.wordB.position.x = initWordBx + (currentScroll / 50);
+
+    state.store.domNodes.word1.setAttribute('style',`transform: translate(${-0.1*currentScroll-20}%, -100%)`);
+    state.store.domNodes.word2.setAttribute('style',`transform: translate(${0.1*currentScroll+20}%, 0)`);
 
     const deltaRot = new Quaternion().setFromEuler(
       new Euler(0, toRadians((currentScroll - previousScroll) * 0.5), 0, "XYZ")
@@ -54,6 +53,9 @@ export async function init() : Promise<boolean> {
   const container = document.getElementById(containerId);
   const canvas = document.getElementById(canvasId);
 
+  const word1 = document.getElementById('js-word1');
+  const word2 = document.getElementById('js-word2');
+
   if (!container || !canvas) {
     return false;
   }
@@ -65,7 +67,7 @@ export async function init() : Promise<boolean> {
 
   const rootObject = new Object3D();
   const bottleObject = new Object3D();
-  const domNodes = { canvas, container };
+  const domNodes = { canvas, container, word1, word2 };
   const renderer = createRenderer(canvas);
   const camera = createCamera(canvas);
   observeResize(renderer, camera);

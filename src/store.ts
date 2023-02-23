@@ -28,6 +28,8 @@ export interface Store {
   domNodes: {
     canvas: HTMLElement;
     container: HTMLElement;
+    word1: HTMLElement;
+    word2: HTMLElement;
   };
   composer?: EffectComposer;
   scene: Scene;
