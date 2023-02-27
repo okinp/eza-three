@@ -9,7 +9,7 @@ interface Luxy {
     wrapper: string;
     wapperSpeed: number;
   }): void;
-};
+}
 
 declare global {
   interface Window {
