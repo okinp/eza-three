@@ -1,17 +1,20 @@
-import type { ILights } from "./lights";
 import {
-  Clock,
+  BufferGeometry,
+  InstancedMesh,
   Mesh,
+  MeshBasicMaterial,
   MeshPhysicalMaterial,
-  WebGLRenderer,
-  Scene,
   Object3D,
   PerspectiveCamera,
-  PointLightHelper,
-  SpotLightHelper,
-  DirectionalLightHelper,
+  Scene,
+  Vector3,
+  WebGLRenderer,
 } from "three";
-import { EffectComposer } from "postprocessing";
+
+interface iDropletMesh {
+  addDroplet: (position: Vector3, normal: Vector3) => void;
+  dropletMesh: InstancedMesh<BufferGeometry, MeshBasicMaterial>;
+}
 
 export interface Store {
   rootObject: Object3D;
@@ -24,6 +27,7 @@ export interface Store {
     frontLabel: MeshPhysicalMaterial;
     liquid: MeshPhysicalMaterial;
     water?: MeshPhysicalMaterial;
+    dropletMaterial: MeshBasicMaterial;
   };
   domNodes: {
     canvas: HTMLElement;
@@ -31,16 +35,9 @@ export interface Store {
     word1: HTMLElement;
     word2: HTMLElement;
   };
-  composer?: EffectComposer;
   scene: Scene;
   renderer: WebGLRenderer;
   camera: PerspectiveCamera;
-  lights: ILights;
-  lightHelpers: {
-    spot: SpotLightHelper[];
-    point: PointLightHelper[];
-    directional: DirectionalLightHelper[];
-  };
   meshes: {
     bottle: Mesh;
     cap: Mesh;
@@ -50,9 +47,16 @@ export interface Store {
     liquid: Mesh;
     water?: Mesh;
   };
+  dropletMeshes: {
+    xs: iDropletMesh;
+    sm: iDropletMesh;
+    md: iDropletMesh;
+    lg: iDropletMesh;
+    xl: iDropletMesh;
+    xxl: iDropletMesh;
+    xxxl: iDropletMesh;
+  };
   isReady: boolean;
-
-  clock: Clock;
 }
 
 interface State {
