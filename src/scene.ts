@@ -1,10 +1,17 @@
 import {
+  ArrowHelper,
+  BufferGeometry,
   Euler,
+  Face,
+  Intersection,
+  Material,
   Mesh,
   MeshPhysicalMaterial,
   Object3D,
   Quaternion,
   Scene,
+  Event as ThreeEvent,
+  Vector3
 } from "three";
 
 import {
@@ -26,6 +33,13 @@ const canvasId = "scene";
 
 import { bottleParams } from "./materials";
 import { setupGui } from "./gui";
+
+const arrowHelper = new ArrowHelper(
+  new Vector3(),
+  new Vector3(),
+  0.25,
+  0xffff00
+)
 
 import state from "./store";
 
@@ -63,7 +77,40 @@ const windowScroll = getScrollCallback((currentScroll, previousScroll) => {
 
 const { onPointerMove, raycast } = intersectionHelper();
 
+if (canvas){
+  canvas.addEventListener("mousemove", onPointerMove);
+}
 
+const rootObject = new Object3D();
+const bottleObject = new Object3D();
+
+const intersectionData = {
+  position: new Vector3(),
+  normal: new Vector3(),
+  isIntersecting: false
+};
+
+const intersectCb = (intersection: Intersection<Object3D<ThreeEvent>> | null) => {
+  if (intersection){
+    const n = new Vector3();
+    const objectNorm = (intersection.face as Face).normal;
+    n.copy(objectNorm);
+    intersectionData.normal.copy(objectNorm);
+    n.transformDirection(intersection.object.matrixWorld)
+  
+    arrowHelper.setDirection(n);
+    arrowHelper.setColor(0x0000ff);
+    arrowHelper.setLength(1.3)
+    const objectPos = bottleObject.worldToLocal(intersection.point);
+    arrowHelper.position.copy(objectPos);
+    intersectionData.position.copy(objectPos);
+    arrowHelper.visible = true;
+    intersectionData.isIntersecting = true;
+  } else {
+    arrowHelper.visible = false;
+    intersectionData.isIntersecting = false;
+  }
+}
 
 
 export async function init(): Promise<boolean> {
@@ -72,8 +119,6 @@ export async function init(): Promise<boolean> {
     return false;
   }
 
-  const rootObject = new Object3D();
-  const bottleObject = new Object3D();
   const domNodes = { canvas, container, word1, word2 };
   const renderer = createRenderer(canvas);
   const camera = createCamera(canvas);
@@ -137,7 +182,8 @@ export async function init(): Promise<boolean> {
         capMesh,
         topLabelMesh,
         frontLabelMesh,
-        backLabelMesh
+        backLabelMesh,
+        arrowHelper
       );
 
       bottleObject.position.set(0, 0.5, 0);
@@ -155,12 +201,12 @@ export async function init(): Promise<boolean> {
       const xxl = drops.scene.children[2] as Mesh;
       const xxxl = drops.scene.children[0] as Mesh;
 
-      const xsMesh = createInstancedDropletMesh(xs, 200);
-      const smMesh = createInstancedDropletMesh(sm, 400);
-      const mdMesh = createInstancedDropletMesh(md, 400);
-      const lgMesh = createInstancedDropletMesh(lg, 100);
-      const xlMesh = createInstancedDropletMesh(xl, 100);
-      const xxlMesh = createInstancedDropletMesh(xxl, 100);
+      const xsMesh = createInstancedDropletMesh(xs, 3);
+      const smMesh = createInstancedDropletMesh(sm, 30);
+      const mdMesh = createInstancedDropletMesh(md, 30);
+      const lgMesh = createInstancedDropletMesh(lg, 30);
+      const xlMesh = createInstancedDropletMesh(xl, 30);
+      const xxlMesh = createInstancedDropletMesh(xxl, 30);
       const xxxlMesh = createInstancedDropletMesh(xxxl, 50);
 
       bottleObject.add(
@@ -222,6 +268,7 @@ export async function init(): Promise<boolean> {
 export function animate() {
   requestAnimationFrame(animate);
   if (state.store) {
+    raycast(Object.values(state.store.meshes).filter( m => m.name !== 'liquid') as Mesh<BufferGeometry, Material>[], state.store.camera, intersectCb );
     state.store.renderer.render(state.store.scene, state.store.camera);
     windowScroll();
   }

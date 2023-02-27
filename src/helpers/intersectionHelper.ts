@@ -7,8 +7,12 @@ const store = {
 }
 
 function onPointerMove(evt: MouseEvent){
-  store.pointer.x  = ( evt.clientX / window.innerWidth ) * 2 - 1;
-  store.pointer.y = - ( evt.clientY / window.innerHeight ) * 2 + 1;
+  if (!evt.currentTarget){
+    return;
+  }
+  const rect = (evt.currentTarget as HTMLElement).getBoundingClientRect();
+  store.pointer.x  = 2*(evt.clientX - rect.left)/rect.width - 1;
+  store.pointer.y = -2*(evt.clientY - rect.top)/rect.height + 1;
 }
 
 
