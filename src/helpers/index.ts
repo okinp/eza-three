@@ -11,3 +11,7 @@ export { isMobile } from "./mobileCheck";
 export { loadTexture, loadTextures, loadGLTFModel, loadFont, loadEnvMapToScene  } from "./loaders";
 
 export { rotate, bounce } from "./animationUtils";
+
+export { createInstancedDropletMesh, dropletMaterial } from "./meshes";
+
+export { default as intersectionHelper} from "./intersectionHelper";
