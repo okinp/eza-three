@@ -12,7 +12,6 @@ import {
   Scene,
   Event as ThreeEvent,
   Vector3,
-  SphereGeometry
 } from "three";
 
 import {

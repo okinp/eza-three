@@ -17,7 +17,7 @@ interface iDropletMesh {
 }
 
 
-interface iDropletMeshes {
+export interface iDropletMeshes {
   xs: iDropletMesh;
   sm: iDropletMesh;
   md: iDropletMesh;

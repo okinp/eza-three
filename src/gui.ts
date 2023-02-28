@@ -1,6 +1,6 @@
 import GUI from 'lil-gui'
 import { createPhysicalMaterialGui } from './helpers';
-import state from "./store";
+import state, { iDropletMeshes } from "./store";
 
 
 export function setupGui( ){
@@ -15,9 +15,9 @@ export function setupGui( ){
       size: 'xs'
     }
 
-    gui.add(dropSizeParams, 'size', ['xs', 'sm', 'md', 'xl', 'xxl', 'xxxl']).onChange( value => {
+    gui.add(dropSizeParams, 'size', ['xs', 'sm', 'md', 'xl', 'xxl', 'xxxl']).onChange( (value: string) => {
       if (state.store){
-        state.store.selectedDropSize = value;
+        state.store.selectedDropSize = value as keyof iDropletMeshes;
         console.log(state.store.selectedDropSize)
       }
     })
