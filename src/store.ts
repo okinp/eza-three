@@ -57,15 +57,15 @@ export interface Store {
     liquid: Mesh;
     water?: Mesh;
   };
-  selectedDropSize: keyof iDropletMeshes,
-  dropletMeshes: {
-    xs: iDropletMesh;
-    sm: iDropletMesh;
-    md: iDropletMesh;
-    xl: iDropletMesh;
-    xxl: iDropletMesh;
-    xxxl: iDropletMesh;
-  };
+  // selectedDropSize: keyof iDropletMeshes,
+  // dropletMeshes: {
+  //   xs: iDropletMesh;
+  //   sm: iDropletMesh;
+  //   md: iDropletMesh;
+  //   xl: iDropletMesh;
+  //   xxl: iDropletMesh;
+  //   xxxl: iDropletMesh;
+  // };
   isReady: boolean;
 }
 

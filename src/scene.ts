@@ -1,27 +1,27 @@
 import {
-  ArrowHelper,
-  BufferGeometry,
+  // ArrowHelper,
+  // BufferGeometry,
   Euler,
-  Face,
-  Intersection,
-  Material,
+  // Face,
+  // Intersection,
+  // Material,
   Mesh,
   MeshPhysicalMaterial,
   Object3D,
   Quaternion,
   Scene,
-  Event as ThreeEvent,
-  Vector3,
+  // Event as ThreeEvent,
+  // Vector3,
 } from "three";
 
 import {
   createCamera,
-  createInstancedDropletMesh,
+  // createInstancedDropletMesh,
   dropletMaterial,
   createRenderer,
   enableDragToRotate,
   getScrollCallback,
-  intersectionHelper,
+  // intersectionHelper,
   loadEnvMapToScene,
   loadGLTFModel,
   observeResize,
@@ -32,14 +32,14 @@ const containerId = "CanvasFrame";
 const canvasId = "scene";
 
 import { bottleParams } from "./materials";
-import { setupGui } from "./gui";
+// import { setupGui } from "./gui";
 
-const arrowHelper = new ArrowHelper(
-  new Vector3(),
-  new Vector3(),
-  0.25,
-  0xffff00
-)
+// const arrowHelper = new ArrowHelper(
+//   new Vector3(),
+//   new Vector3(),
+//   0.25,
+//   0xffff00
+// )
 
 import state from "./store";
 
@@ -75,42 +75,42 @@ const windowScroll = getScrollCallback((currentScroll, previousScroll) => {
 });
 
 
-const { onPointerMove, raycast } = intersectionHelper();
+// const { onPointerMove, raycast } = intersectionHelper();
 
-if (canvas){
-  canvas.addEventListener("mousemove", onPointerMove);
-}
+// if (canvas){
+//   canvas.addEventListener("mousemove", onPointerMove);
+// }
 
 const rootObject = new Object3D();
 const bottleObject = new Object3D();
 
-const intersectionData = {
-  position: new Vector3(),
-  normal: new Vector3(),
-  isIntersecting: false
-};
+// const intersectionData = {
+//   position: new Vector3(),
+//   normal: new Vector3(),
+//   isIntersecting: false
+// };
 
-const intersectCb = (intersection: Intersection<Object3D<ThreeEvent>> | null) => {
-  if (intersection){
-    const n = new Vector3();
-    const objectNorm = (intersection.face as Face).normal;
-    n.copy(objectNorm);
-    intersectionData.normal.copy(objectNorm);
-    n.transformDirection(intersection.object.matrixWorld)
+// const intersectCb = (intersection: Intersection<Object3D<ThreeEvent>> | null) => {
+//   if (intersection){
+//     const n = new Vector3();
+//     const objectNorm = (intersection.face as Face).normal;
+//     n.copy(objectNorm);
+//     intersectionData.normal.copy(objectNorm);
+//     n.transformDirection(intersection.object.matrixWorld)
   
-    arrowHelper.setDirection(n);
-    arrowHelper.setColor(0x0000ff);
-    arrowHelper.setLength(1.3)
-    const objectPos = bottleObject.worldToLocal(intersection.point);
-    arrowHelper.position.copy(objectPos);
-    intersectionData.position.copy(objectPos);
-    arrowHelper.visible = true;
-    intersectionData.isIntersecting = true;
-  } else {
-    arrowHelper.visible = false;
-    intersectionData.isIntersecting = false;
-  }
-}
+//     arrowHelper.setDirection(n);
+//     arrowHelper.setColor(0x0000ff);
+//     arrowHelper.setLength(1.3)
+//     const objectPos = bottleObject.worldToLocal(intersection.point);
+//     arrowHelper.position.copy(objectPos);
+//     intersectionData.position.copy(objectPos);
+//     arrowHelper.visible = true;
+//     intersectionData.isIntersecting = true;
+//   } else {
+//     arrowHelper.visible = false;
+//     intersectionData.isIntersecting = false;
+//   }
+// }
 
 
 export async function init(): Promise<boolean> {
@@ -132,15 +132,14 @@ export async function init(): Promise<boolean> {
   try {
     await Promise.all([
       loadGLTFModel(`${filePath}/glb/${bottleName}.glb`, true),
-      loadGLTFModel(`${filePath}/glb/drops2.glb`, true),
       loadEnvMapToScene(
         `${filePath}/envmap/${envmapFilename}.hdr`,
         scene,
         renderer
       ),
-    ]).then(([gltf, drops]) => {
+    ]).then(([gltf]) => {
 
-      console.log(drops);
+      // console.log(drops);
 
       container.classList.remove("loading");
 
@@ -177,32 +176,27 @@ export async function init(): Promise<boolean> {
         backLabelMaterial.setValues(params.backLabel);
       }
 
-      const xs = drops.scene.children[3] as Mesh;
+      // const xs = drops.scene.children[3] as Mesh;
 
-      const sm = drops.scene.children[4] as Mesh;
+      // const sm = drops.scene.children[4] as Mesh;
 
-      const md = drops.scene.children[5] as Mesh;
+      // const md = drops.scene.children[5] as Mesh;
 
-      const xl = drops.scene.children[1] as Mesh;
+      // const xl = drops.scene.children[1] as Mesh;
       
-      const xxl = drops.scene.children[2] as Mesh;
+      // const xxl = drops.scene.children[2] as Mesh;
       
-      const xxxl = drops.scene.children[0] as Mesh;
+      // const xxxl = drops.scene.children[0] as Mesh;
 
-      // const geometry  = new SphereGeometry(0.01,32,16);
-      // const material = new MeshPhysicalMaterial();
 
-      // const drop = new Mesh(geometry, material);   
-      // drop.scale.set(0.001,0.001,0.001)  
+      // const xsMesh = createInstancedDropletMesh(xs, 300);
+      // const smMesh = createInstancedDropletMesh(sm, 30);
+      // const mdMesh = createInstancedDropletMesh(md, 30);
+      // const xlMesh = createInstancedDropletMesh(xl, 30);
+      // const xxlMesh = createInstancedDropletMesh(xxl, 30);
+      // const xxxlMesh = createInstancedDropletMesh(xxxl, 50);
 
-      const xsMesh = createInstancedDropletMesh(xs, 300);
-      const smMesh = createInstancedDropletMesh(sm, 30);
-      const mdMesh = createInstancedDropletMesh(md, 30);
-      const xlMesh = createInstancedDropletMesh(xl, 30);
-      const xxlMesh = createInstancedDropletMesh(xxl, 30);
-      const xxxlMesh = createInstancedDropletMesh(xxxl, 50);
-
-      console.log(xsMesh);
+      // console.log(xsMesh);
 
       bottleObject.add(
         liquidMesh,
@@ -211,13 +205,13 @@ export async function init(): Promise<boolean> {
         topLabelMesh,
         frontLabelMesh,
         backLabelMesh,
-        arrowHelper,
-        xsMesh.dropletMesh,
-        smMesh.dropletMesh,
-        mdMesh.dropletMesh,
-        xlMesh.dropletMesh,
-        xxlMesh.dropletMesh,
-        xxxlMesh.dropletMesh
+        // arrowHelper,
+        // xsMesh.dropletMesh,
+        // smMesh.dropletMesh,
+        // mdMesh.dropletMesh,
+        // xlMesh.dropletMesh,
+        // xxlMesh.dropletMesh,
+        // xxxlMesh.dropletMesh
       );
 
       bottleObject.position.set(0, 0.5, 0);
@@ -253,25 +247,27 @@ export async function init(): Promise<boolean> {
           frontLabel: frontLabelMesh,
           backLabel: backLabelMesh,
         },
-        selectedDropSize: 'xs',
-        dropletMeshes: {
-          xs: xsMesh,
-          sm: smMesh,
-          md: mdMesh,
-          xl: xlMesh,
-          xxl: xxlMesh,
-          xxxl: xxxlMesh
-        },
-        isReady: true,
+        // selectedDropSize: 'xs',
+        // dropletMeshes: {
+        //   xs: xsMesh,
+        //   sm: smMesh,
+        //   md: mdMesh,
+        //   xl: xlMesh,
+        //   xxl: xxlMesh,
+        //   xxxl: xxxlMesh
+        // },
+        isReady: true,      // canvas.addEventListener('mousedown', () => {
+      //   if (intersectionData.isIntersecting && state.store?.selectedDropSize){
+      //     state.store.dropletMeshes[state.store.selectedDropSize].addDroplet(intersectionData.position, intersectionData.normal);
+      //   }
+      // })
       };
-      console.log(state.store);
       enableDragToRotate(state.store.domNodes.canvas, state.store.bottleObject);
-      setupGui();
-      canvas.addEventListener('mousedown', () => {
-        if (intersectionData.isIntersecting && state.store?.selectedDropSize){
-          state.store.dropletMeshes[state.store.selectedDropSize].addDroplet(intersectionData.position, intersectionData.normal);
-        }
-      })
+      // canvas.addEventListener('mousedown', () => {
+      //   if (intersectionData.isIntersecting && state.store?.selectedDropSize){
+      //     state.store.dropletMeshes[state.store.selectedDropSize].addDroplet(intersectionData.position, intersectionData.normal);
+      //   }
+      // })
     });
   } catch(err) {
     console.log(err);
@@ -284,7 +280,7 @@ export async function init(): Promise<boolean> {
 export function animate() {
   requestAnimationFrame(animate);
   if (state.store) {
-    raycast(Object.values(state.store.meshes).filter( m => m.name !== 'liquid') as Mesh<BufferGeometry, Material>[], state.store.camera, intersectCb );
+    // raycast(Object.values(state.store.meshes).filter( m => m.name !== 'liquid') as Mesh<BufferGeometry, Material>[], state.store.camera, intersectCb );
     state.store.renderer.render(state.store.scene, state.store.camera);
     windowScroll();
   }
