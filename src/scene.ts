@@ -215,7 +215,10 @@ export async function init(): Promise<boolean> {
       );
 
       bottleObject.position.set(0, 0.5, 0);
-      bottleObject.scale.set(2, 2, 2);
+      
+      const scaleFactor = canvas.clientWidth < 1024 ? 1.6 : 2;
+      bottleObject.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
       bottleObject.rotation.set(0, 0, Math.PI / 9);
 
       rootObject.add(bottleObject);

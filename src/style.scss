@@ -86,7 +86,19 @@ canvas{
       background-color: #C8E4EA;
     }
   }
-
+  @media only screen and (max-width: 1024px){
+    font-size: 120px;
+    .circle {
+      width: 400px;
+      height: 400px;
+      > .word1 {
+        transform: translate(0%, -100%);
+      }
+      > .word2 {
+        transform: translate(0, 0);
+      }
+    }
+  } 
 
 }
 
