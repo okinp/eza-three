@@ -1,4 +1,4 @@
-import { Vector2, Raycaster, Mesh, PerspectiveCamera, Object3D, Intersection, Event as ThreeEvent } from "three";
+import { Vector2, Raycaster, Mesh, PerspectiveCamera, Object3D, Matrix4, Intersection, Event as ThreeEvent } from "three";
 
 
 const store = {
@@ -16,7 +16,7 @@ function onPointerMove(evt: MouseEvent){
 }
 
 
-function raycast(meshes: Mesh[], camera: PerspectiveCamera, cb: (intersection: Intersection<Object3D<ThreeEvent>> | null) => void){
+function raycast( meshes: Mesh[], camera: PerspectiveCamera, cb: (intersection: Intersection<Object3D<ThreeEvent>> | null) => void){
     store.raycaster.setFromCamera(store.pointer, camera);
     const intersects = store.raycaster.intersectObjects(meshes, false);
     if (intersects.length){

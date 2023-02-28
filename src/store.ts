@@ -16,6 +16,16 @@ interface iDropletMesh {
   dropletMesh: InstancedMesh<BufferGeometry, MeshBasicMaterial>;
 }
 
+
+interface iDropletMeshes {
+  xs: iDropletMesh;
+  sm: iDropletMesh;
+  md: iDropletMesh;
+  xl: iDropletMesh;
+  xxl: iDropletMesh;
+  xxxl: iDropletMesh;
+}
+
 export interface Store {
   rootObject: Object3D;
   bottleObject: Object3D;
@@ -47,11 +57,11 @@ export interface Store {
     liquid: Mesh;
     water?: Mesh;
   };
+  selectedDropSize: keyof iDropletMeshes,
   dropletMeshes: {
     xs: iDropletMesh;
     sm: iDropletMesh;
     md: iDropletMesh;
-    lg: iDropletMesh;
     xl: iDropletMesh;
     xxl: iDropletMesh;
     xxxl: iDropletMesh;

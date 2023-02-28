@@ -10,9 +10,18 @@ export function setupGui( ){
     }
 
     const gui = new GUI({ title: '🐞 Debug GUI', width: 400 });
-    
-    console.log(state.store.materials);
 
+    const dropSizeParams = {
+      size: 'xs'
+    }
+
+    gui.add(dropSizeParams, 'size', ['xs', 'sm', 'md', 'xl', 'xxl', 'xxxl']).onChange( value => {
+      if (state.store){
+        state.store.selectedDropSize = value;
+        console.log(state.store.selectedDropSize)
+      }
+    })
+    
     const bottleParams = createPhysicalMaterialGui('BottleMaterial', state.store.materials.bottle, gui)
     const liquidParams = createPhysicalMaterialGui('LiquidMaterial', state.store.materials.liquid, gui);
     const kapakiParams = createPhysicalMaterialGui('KapakiMaterial', state.store.materials.cap, gui);
@@ -23,6 +32,9 @@ export function setupGui( ){
     let preset = {}
     
     const params = {
+      dropSize: {
+        size: 'xs'
+      },
       bottle: bottleParams,
       liquid: liquidParams,
       kapaki: kapakiParams,

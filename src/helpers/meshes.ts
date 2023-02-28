@@ -27,16 +27,21 @@ export function createInstancedDropletMesh(droplet: Mesh, maxCount = 2000) {
   dropletMesh.instanceMatrix.setUsage(DynamicDrawUsage);
   dropletMesh.count = 0;
 
+  const dummy = new Object3D();
+
   const addDroplet = (position: Vector3, normal: Vector3) => {
     if (dropletMesh.count < maxCount ){
+      const _n = normal.copy(normal);
+      const _p = position.copy(position);
+      _n.add(_p);
       const idx = dropletMesh.count;
-      const dummy = new Object3D();
-      normal.add(position);
-      dummy.position.copy(position);
-      dummy.lookAt(normal);
+      dummy.scale.set(0.01,0.01,0.01)
+      dummy.position.copy(_p);
+      dummy.lookAt(_n);
       dummy.updateMatrix();
       dropletMesh.setMatrixAt(idx, dummy.matrix);
-      dropletMesh.count = idx + 1;
+      dropletMesh.instanceMatrix.needsUpdate = true;
+      dropletMesh.count +=1;
     }
   }
 

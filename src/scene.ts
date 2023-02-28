@@ -11,7 +11,8 @@ import {
   Quaternion,
   Scene,
   Event as ThreeEvent,
-  Vector3
+  Vector3,
+  SphereGeometry
 } from "three";
 
 import {
@@ -132,7 +133,7 @@ export async function init(): Promise<boolean> {
   try {
     await Promise.all([
       loadGLTFModel(`${filePath}/glb/${bottleName}.glb`, true),
-      loadGLTFModel(`${filePath}/glb/drops.glb`, true),
+      loadGLTFModel(`${filePath}/glb/drops2.glb`, true),
       loadEnvMapToScene(
         `${filePath}/envmap/${envmapFilename}.hdr`,
         scene,
@@ -140,6 +141,7 @@ export async function init(): Promise<boolean> {
       ),
     ]).then(([gltf, drops]) => {
 
+      console.log(drops);
 
       container.classList.remove("loading");
 
@@ -176,6 +178,33 @@ export async function init(): Promise<boolean> {
         backLabelMaterial.setValues(params.backLabel);
       }
 
+      const xs = drops.scene.children[3] as Mesh;
+
+      const sm = drops.scene.children[4] as Mesh;
+
+      const md = drops.scene.children[5] as Mesh;
+
+      const xl = drops.scene.children[1] as Mesh;
+      
+      const xxl = drops.scene.children[2] as Mesh;
+      
+      const xxxl = drops.scene.children[0] as Mesh;
+
+      // const geometry  = new SphereGeometry(0.01,32,16);
+      // const material = new MeshPhysicalMaterial();
+
+      // const drop = new Mesh(geometry, material);   
+      // drop.scale.set(0.001,0.001,0.001)  
+
+      const xsMesh = createInstancedDropletMesh(xs, 300);
+      const smMesh = createInstancedDropletMesh(sm, 30);
+      const mdMesh = createInstancedDropletMesh(md, 30);
+      const xlMesh = createInstancedDropletMesh(xl, 30);
+      const xxlMesh = createInstancedDropletMesh(xxl, 30);
+      const xxxlMesh = createInstancedDropletMesh(xxxl, 50);
+
+      console.log(xsMesh);
+
       bottleObject.add(
         liquidMesh,
         bottleMesh,
@@ -183,7 +212,13 @@ export async function init(): Promise<boolean> {
         topLabelMesh,
         frontLabelMesh,
         backLabelMesh,
-        arrowHelper
+        arrowHelper,
+        xsMesh.dropletMesh,
+        smMesh.dropletMesh,
+        mdMesh.dropletMesh,
+        xlMesh.dropletMesh,
+        xxlMesh.dropletMesh,
+        xxxlMesh.dropletMesh
       );
 
       bottleObject.position.set(0, 0.5, 0);
@@ -193,31 +228,7 @@ export async function init(): Promise<boolean> {
       rootObject.add(bottleObject);
       rootObject.position.y = 1;
 
-      const xs = drops.scene.children[3] as Mesh;
-      const sm = drops.scene.children[4] as Mesh;
-      const md = drops.scene.children[5] as Mesh;
-      const lg = drops.scene.children[6] as Mesh;
-      const xl = drops.scene.children[1] as Mesh;
-      const xxl = drops.scene.children[2] as Mesh;
-      const xxxl = drops.scene.children[0] as Mesh;
 
-      const xsMesh = createInstancedDropletMesh(xs, 3);
-      const smMesh = createInstancedDropletMesh(sm, 30);
-      const mdMesh = createInstancedDropletMesh(md, 30);
-      const lgMesh = createInstancedDropletMesh(lg, 30);
-      const xlMesh = createInstancedDropletMesh(xl, 30);
-      const xxlMesh = createInstancedDropletMesh(xxl, 30);
-      const xxxlMesh = createInstancedDropletMesh(xxxl, 50);
-
-      bottleObject.add(
-        xsMesh.dropletMesh,
-        smMesh.dropletMesh,
-        mdMesh.dropletMesh,
-        lgMesh.dropletMesh,
-        xlMesh.dropletMesh,
-        xxlMesh.dropletMesh,
-        xxxlMesh.dropletMesh
-      )
 
       state.store = {
         rootObject,
@@ -243,22 +254,28 @@ export async function init(): Promise<boolean> {
           frontLabel: frontLabelMesh,
           backLabel: backLabelMesh,
         },
+        selectedDropSize: 'xs',
         dropletMeshes: {
           xs: xsMesh,
           sm: smMesh,
           md: mdMesh,
-          lg: lgMesh,
           xl: xlMesh,
           xxl: xxlMesh,
           xxxl: xxxlMesh
         },
         isReady: true,
       };
+      console.log(state.store);
       enableDragToRotate(state.store.domNodes.canvas, state.store.bottleObject);
       setupGui();
-      console.log(state.store.materials);
+      canvas.addEventListener('mousedown', () => {
+        if (intersectionData.isIntersecting && state.store?.selectedDropSize){
+          state.store.dropletMeshes[state.store.selectedDropSize].addDroplet(intersectionData.position, intersectionData.normal);
+        }
+      })
     });
-  } catch {
+  } catch(err) {
+    console.log(err);
     return false;
   }
 
