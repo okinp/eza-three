@@ -1,6 +1,7 @@
 import {
   BufferGeometry,
   InstancedMesh,
+  Line,
   Mesh,
   MeshBasicMaterial,
   MeshPhysicalMaterial,
@@ -29,6 +30,8 @@ export interface iDropletMeshes {
 export interface Store {
   rootObject: Object3D;
   bottleObject: Object3D;
+  line: Line;
+  mouseHelper: Mesh;
   materials: {
     bottle: MeshPhysicalMaterial;
     cap: MeshPhysicalMaterial;
