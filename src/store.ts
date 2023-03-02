@@ -3,7 +3,6 @@ import {
   InstancedMesh,
   Line,
   Mesh,
-  MeshBasicMaterial,
   MeshPhysicalMaterial,
   Object3D,
   PerspectiveCamera,
@@ -14,7 +13,7 @@ import {
 
 interface iDropletMesh {
   addDroplet: (position: Vector3, normal: Vector3) => void;
-  dropletMesh: InstancedMesh<BufferGeometry, MeshBasicMaterial>;
+  dropletMesh: InstancedMesh<BufferGeometry, MeshPhysicalMaterial>;
 }
 
 
