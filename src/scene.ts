@@ -136,6 +136,7 @@ function shootDroplet() {
   state.store.dropletMeshes[state.store.selectedDropSize].addDroplet(state.store.bottleObject.worldToLocal(position), intersection.normal);
 
   }
+  console.log(state.store)
 }
 
 

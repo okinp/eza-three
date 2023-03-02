@@ -40,7 +40,7 @@ export interface Store {
     frontLabel: MeshPhysicalMaterial;
     liquid: MeshPhysicalMaterial;
     water?: MeshPhysicalMaterial;
-    dropletMaterial: MeshBasicMaterial;
+    dropletMaterial: MeshPhysicalMaterial;
   };
   domNodes: {
     canvas: HTMLElement;

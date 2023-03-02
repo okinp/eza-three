@@ -5,11 +5,12 @@ export interface MaterialParams {
   wireframe: boolean
 }
 
-type CombineType = 0 | 1 | 2;
+export type CombineType = 0 | 1 | 2;
 
 export interface BasicMaterialParams extends MaterialParams {
   combine: CombineType,
-  reflectivity: number
+  reflectivity: number,
+  refractionRatio: number
 }
 
 

@@ -1,5 +1,5 @@
 import { MeshPhysicalMaterial, MeshBasicMaterial, MeshStandardMaterial } from 'three';
-import type { BasicMaterialParams,  StandardMaterialParams, PhysicalMaterialParams } from "../types/materials";
+import type { BasicMaterialParams,  StandardMaterialParams, PhysicalMaterialParams, CombineType } from "../types/materials";
 
 import GUI from 'lil-gui'
 
@@ -11,9 +11,11 @@ type ColorPropertyStandard = ColorPropertyBasic | 'emissive';
 
 type ColorPropertyPhysical = ColorPropertyStandard | 'attenuationColor' | 'specularColor' ;
 
-type BasicNumberProperty = 'opacity';
+type BaseNumberProperty = 'opacity'
 
-type StandardNumberProperty = BasicNumberProperty | 'emissiveIntensity' | 'metalness' | 'roughness';
+type BasicNumberProperty = BaseNumberProperty | 'reflectivity' | 'refractionRatio';
+
+type StandardNumberProperty = BaseNumberProperty | 'emissiveIntensity' | 'metalness' | 'roughness';
 
 type PhysicalNumberProperty = StandardNumberProperty | 'clearcoat' | 'clearcoatRoughness' | 'attenuationDistance' | 'reflectivity' | 'transmission' | 'specularIntensity' | 'thickness' | 'ior';
 
@@ -58,6 +60,23 @@ function createStandardMaterialParams(material: MeshStandardMaterial) : Standard
     }
 }
 
+function createBasicMaterialParams(material: MeshBasicMaterial) : BasicMaterialParams {
+  return {
+    color: material.color.getHex(),
+    opacity: material.opacity,
+    wireframe: material.wireframe,
+    combine: material.combine as CombineType,
+    reflectivity: material.reflectivity,
+    refractionRatio: material.refractionRatio
+  }
+}
+
+function addBasicMaterialColorToGui(params: BasicMaterialParams, property: ColorPropertyBasic, gui: GUI, material: MeshBasicMaterial){
+  gui.addColor(params, property).onChange((color: number) => {
+      material[property].setHex(color)
+  })
+}
+
 
 function addStandardMaterialColorToGui(params: StandardMaterialParams, property: ColorPropertyStandard, gui: GUI, material: MeshStandardMaterial){
   gui.addColor(params, property).onChange((color: number) => {
@@ -72,6 +91,11 @@ function addPhysicalMaterialColorToGui(params: PhysicalMaterialParams, property:
   })
 }
 
+function addBasicMaterialNumberToGui(params: BasicMaterialParams, property: BasicNumberProperty, gui: GUI, material: MeshBasicMaterial, min: number, max: number){
+  gui.add(params, property, min, max ).onChange((val: number) => {
+      material[property] = val;
+  })
+}
 
 function addStandardMaterialNumberToGui(params: StandardMaterialParams, property: StandardNumberProperty, gui: GUI, material: MeshStandardMaterial, min: number, max: number){
   gui.add( params, property, min, max ).onChange( function ( val: number ) {
@@ -92,6 +116,8 @@ function addStandardMaterialBooleanToGui(params: StandardMaterialParams, propert
   } );
 }
 
+
+
 function addBasicMaterialBooleanToGui(params: BasicMaterialParams | PhysicalMaterialParams, property: BasicBooleanProperty, gui: GUI, material: MeshBasicMaterial | MeshPhysicalMaterial){
   gui.add( params, property).onChange( function ( val: boolean ) {
       material[property] = val;
@@ -99,7 +125,19 @@ function addBasicMaterialBooleanToGui(params: BasicMaterialParams | PhysicalMate
 }
 
 
+export function createBasicMaterialGui(folderName: string, material: MeshBasicMaterial, gui: GUI){
+  const materialFolder = gui.addFolder(folderName);
+  const params = createBasicMaterialParams(material);
+  //Material params;
+  addBasicMaterialColorToGui(params, 'color', materialFolder, material);
+  addBasicMaterialNumberToGui(params, 'opacity', materialFolder, material, 0, 1);
+  addBasicMaterialBooleanToGui(params, 'wireframe', materialFolder, material);
+  //BasicMaterial params
+  addBasicMaterialNumberToGui(params, 'reflectivity', materialFolder, material, 0, 1);
+  addBasicMaterialNumberToGui(params, 'refractionRatio', materialFolder, material, 0, 1);
+  return params;
 
+}
 
 
 export function createStandardMaterialGui(folderName: string, material: MeshStandardMaterial, gui: GUI){

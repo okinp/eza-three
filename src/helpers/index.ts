@@ -2,7 +2,7 @@ export { createRenderer, createCamera } from "./sceneUtils";
 
 export { toRadians, getScrollCallback, enableDragToRotate } from "./callbacks"
 
-export { createPhysicalMaterialGui, createStandardMaterialGui } from "./guiUtils";
+export { createBasicMaterialGui, createPhysicalMaterialGui, createStandardMaterialGui } from "./guiUtils";
 
 export { toggleFullScreen } from "./fullscreen";
 export { observeResize } from "./responsiveness";

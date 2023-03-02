@@ -21,6 +21,8 @@ export function setupGui( ){
         console.log(state.store.selectedDropSize)
       }
     })
+
+    const dropletParams = createPhysicalMaterialGui('Droplets', state.store.materials.dropletMaterial, gui);
     
     const bottleParams = createPhysicalMaterialGui('BottleMaterial', state.store.materials.bottle, gui)
     const liquidParams = createPhysicalMaterialGui('LiquidMaterial', state.store.materials.liquid, gui);
@@ -35,6 +37,7 @@ export function setupGui( ){
       dropSize: {
         size: 'xs'
       },
+      droplet: dropletParams,
       bottle: bottleParams,
       liquid: liquidParams,
       kapaki: kapakiParams,
