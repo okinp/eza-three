@@ -37,8 +37,6 @@ const canvasId = "scene";
 import { bottleParams } from "./materials";
 import { setupGui } from "./gui";
 
-
-
 import state from "./store";
 
 const container = document.getElementById(containerId);
@@ -50,7 +48,8 @@ const word2 = document.getElementById("js-word2");
 const filePath = "/wp-content/themes/eza_theme/3d";
 const envmapFilename = "studio_country_hall_1k";
 
-const bottleName = container?.dataset.file ?? "finelager";
+let bottleName = container?.dataset.file ?? "finelager";
+bottleName = "finelager2";
 
 const windowScroll = getScrollCallback((currentScroll, previousScroll) => {
   if (state.store) {
@@ -72,10 +71,9 @@ const windowScroll = getScrollCallback((currentScroll, previousScroll) => {
   }
 });
 
-
 const { onPointerMove, raycast } = intersectionHelper();
 
-if (canvas){
+if (canvas) {
   canvas.addEventListener("mousemove", onPointerMove);
 }
 
@@ -85,7 +83,7 @@ const bottleObject = new Object3D();
 const intersection = {
   point: new Vector3(),
   normal: new Vector3(),
-  intersects: false
+  intersects: false,
 };
 
 const intersectCb = (
@@ -93,55 +91,49 @@ const intersectCb = (
 ) => {
   if (!state.store) return;
 
-  if (intersects && intersects.length > 0){
+  if (intersects && intersects.length > 0) {
+    const n = (intersects[0].face as Face).normal.clone();
 
     const p = intersects[0].point;
     state.store.mouseHelper.position.copy(p);
-    intersection.point.copy(p);
+    intersection.point.copy(p.add(n.multiplyScalar(0.02)));
 
-
-    const n = (intersects[0].face as Face).normal.clone();
     n.transformDirection(state.store.bottleObject.matrixWorld);
     n.multiplyScalar(4);
     n.add(intersects[0].point);
 
-    intersects[0].face && intersection.normal.copy( intersects[0].face.normal );
+    intersects[0].face && intersection.normal.copy(intersects[0].face.normal);
     state.store.mouseHelper.lookAt(n);
 
     const positions = state.store.line.geometry.attributes.position;
-    positions.setXYZ( 0, p.x, p.y, p.z );
-    positions.setXYZ( 1, n.x, n.y, n.z );
+    positions.setXYZ(0, p.x, p.y, p.z);
+    positions.setXYZ(1, n.x, n.y, n.z);
     positions.needsUpdate = true;
 
     intersection.intersects = true;
 
     intersects.length = 0;
-
   } else {
     intersection.intersects = false;
   }
 };
 
-
 function shootDroplet() {
   if (!state.store) return;
-  if (intersection.intersects && state.store?.selectedDropSize){
-    
-  const position = new Vector3();
-  const orientation = new Euler();
+  if (intersection.intersects && state.store?.selectedDropSize) {
+    const position = new Vector3();
+    const orientation = new Euler();
 
-
-  position.copy( intersection.point );
-  orientation.copy( state.store.mouseHelper.rotation );
-  state.store.dropletMeshes[state.store.selectedDropSize].addDroplet(state.store.bottleObject.worldToLocal(position), intersection.normal);
-
+    position.copy(intersection.point);
+    orientation.copy(state.store.mouseHelper.rotation);
+    state.store.dropletMeshes[state.store.selectedDropSize].addDroplet(
+      state.store.bottleObject.worldToLocal(position),
+      intersection.normal
+    );
   }
-  console.log(state.store)
 }
 
-
 export async function init(): Promise<boolean> {
-
   if (!container || !canvas || !word1 || !word2) {
     return false;
   }
@@ -166,8 +158,7 @@ export async function init(): Promise<boolean> {
         renderer
       ),
     ]).then(([gltf, drops]) => {
-
-      console.log(drops);
+      console.log(gltf);
 
       container.classList.remove("loading");
 
@@ -194,6 +185,8 @@ export async function init(): Promise<boolean> {
       const backLabelMesh = gltf.scene.children[5] as Mesh;
       const backLabelMaterial = backLabelMesh.material as MeshPhysicalMaterial;
 
+      const outerMesh = gltf.scene.children[6] as Mesh;
+
       if (bottleName in bottleParams) {
         const params = bottleParams[bottleName as keyof bottleParams];
         bottleMaterial.setValues(params.bottle);
@@ -211,18 +204,17 @@ export async function init(): Promise<boolean> {
       const md = drops.scene.children[5] as Mesh;
 
       const xl = drops.scene.children[1] as Mesh;
-      
+
       const xxl = drops.scene.children[2] as Mesh;
-      
+
       const xxxl = drops.scene.children[0] as Mesh;
 
-
-      const xsMesh = createInstancedDropletMesh(xs, 300);
-      const smMesh = createInstancedDropletMesh(sm, 30);
-      const mdMesh = createInstancedDropletMesh(md, 30);
-      const xlMesh = createInstancedDropletMesh(xl, 30);
-      const xxlMesh = createInstancedDropletMesh(xxl, 30);
-      const xxxlMesh = createInstancedDropletMesh(xxxl, 50);
+      const xsMesh = createInstancedDropletMesh(xs, 500);
+      const smMesh = createInstancedDropletMesh(sm, 500);
+      const mdMesh = createInstancedDropletMesh(md, 500);
+      const xlMesh = createInstancedDropletMesh(xl, 500);
+      const xxlMesh = createInstancedDropletMesh(xxl, 500);
+      const xxxlMesh = createInstancedDropletMesh(xxxl, 1000);
 
       console.log(xsMesh);
 
@@ -233,6 +225,7 @@ export async function init(): Promise<boolean> {
         topLabelMesh,
         frontLabelMesh,
         backLabelMesh,
+        outerMesh,
         xsMesh.dropletMesh,
         smMesh.dropletMesh,
         mdMesh.dropletMesh,
@@ -248,13 +241,16 @@ export async function init(): Promise<boolean> {
       rootObject.add(bottleObject);
       rootObject.position.y = 1;
 
-      const mouseHelper = new Mesh(new BoxGeometry(1,1,10), new MeshNormalMaterial());
+      const mouseHelper = new Mesh(
+        new BoxGeometry(1, 1, 10),
+        new MeshNormalMaterial()
+      );
       mouseHelper.visible = false;
 
       const geometry = new BufferGeometry();
-      geometry.setFromPoints( [ new Vector3(), new Vector3() ] );
-      const line = new Line( geometry, new LineBasicMaterial() );
-      scene.add( line )
+      geometry.setFromPoints([new Vector3(), new Vector3()]);
+      const line = new Line(geometry, new LineBasicMaterial());
+      scene.add(line);
 
       state.store = {
         rootObject,
@@ -268,7 +264,7 @@ export async function init(): Promise<boolean> {
           backLabel: backLabelMaterial,
           topLabel: topLabelMaterial,
           cap: kapakiMaterial,
-          dropletMaterial
+          dropletMaterial,
         },
         domNodes,
         scene,
@@ -282,38 +278,47 @@ export async function init(): Promise<boolean> {
           frontLabel: frontLabelMesh,
           backLabel: backLabelMesh,
         },
-        selectedDropSize: 'xs',
+        selectedDropSize: "xs",
         dropletMeshes: {
           xs: xsMesh,
           sm: smMesh,
           md: mdMesh,
           xl: xlMesh,
           xxl: xxlMesh,
-          xxxl: xxxlMesh
+          xxxl: xxxlMesh,
         },
         isReady: true,
       };
+
       console.log(state.store);
+
+
       enableDragToRotate(state.store.domNodes.canvas, state.store.bottleObject);
       setupGui();
-
-      canvas.addEventListener('mousedown', shootDroplet);
-
-
+      canvas.addEventListener("mousedown", shootDroplet);
+    
     });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     return false;
   }
-
   return true;
 }
 
 export function animate() {
   requestAnimationFrame(animate);
   if (state.store) {
-    raycast(Object.values(state.store.meshes).filter( m => m.name === 'bottle') as Mesh<BufferGeometry, Material>[], state.store.camera, intersectCb );
-    state.store.renderer.render(state.store.scene, state.store.camera);
+    const { camera, renderer, scene, meshes 
+  } = state.store;
+    raycast(
+      Object.values(meshes).filter((m) => m.name === "bottle") as Mesh<
+        BufferGeometry,
+        Material
+      >[],
+      camera,
+      intersectCb
+    );
+    renderer.render(scene, camera);
     windowScroll();
   }
 }

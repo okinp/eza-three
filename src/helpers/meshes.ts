@@ -5,7 +5,7 @@ import {
   DynamicDrawUsage,
   Vector3,
   Object3D,
-  MeshPhysicalMaterial,
+  MeshBasicMaterial,
 } from "three";
 
 
@@ -15,13 +15,14 @@ const defaultTransform = new Matrix4()
   .multiply(new Matrix4().makeScale(7, 7, 7));
 
 
-export const dropletMaterial = new MeshPhysicalMaterial();
-dropletMaterial.ior = 1.042406;
-dropletMaterial.emissiveIntensity = 0.442;
-dropletMaterial.clearcoat = 0.686;
-dropletMaterial.reflectivity = 0.131;
-dropletMaterial.transmission = 1;
-dropletMaterial.thickness = 2.4;
+export const dropletMaterial = new MeshBasicMaterial({ color: 0xffffff, refractionRatio: 0.95 });
+// dropletMaterial.opacity = 0.05;
+// dropletMaterial.ior = 1.042406;
+// dropletMaterial.emissiveIntensity = 0.442;
+// dropletMaterial.clearcoat = 0.686;
+// dropletMaterial.reflectivity = 0.131;
+// dropletMaterial.transmission = 1;
+// dropletMaterial.thickness = 2.4;
 
 export function createInstancedDropletMesh(droplet: Mesh, maxCount = 2000) {
 
@@ -40,7 +41,7 @@ export function createInstancedDropletMesh(droplet: Mesh, maxCount = 2000) {
       const _p = position.copy(position);
       _n.add(_p);
       const idx = dropletMesh.count;
-      const scale = 0.005 * Math.random() + 0.002
+      const scale = 0.0008 * Math.random() + 0.004
       dummy.scale.set(scale, scale, scale)
       dummy.position.copy(_p);
       dummy.lookAt(_n);

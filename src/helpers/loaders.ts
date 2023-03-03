@@ -1,4 +1,4 @@
-import { HalfFloatType, PMREMGenerator, Scene, Texture, TextureEncoding, TextureLoader, WebGLRenderer } from "three";
+import { EquirectangularReflectionMapping, HalfFloatType, PMREMGenerator, Scene, Texture, TextureEncoding, TextureLoader, WebGLRenderer } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
@@ -57,14 +57,17 @@ export async function loadEnvMapToScene(
   scene: Scene,
   renderer: WebGLRenderer
 ) {
+  renderer.shadowMap.enabled = true;
   const envLoader = new RGBELoader();
   envLoader.setDataType(HalfFloatType);
   const pmremGenerator = new PMREMGenerator(renderer);
   pmremGenerator.compileEquirectangularShader();
 
   const env = await envLoader.loadAsync(url);
+  env.mapping = EquirectangularReflectionMapping;
   const HDRImap = pmremGenerator.fromEquirectangular(env).texture;
 
+  // scene.background = HDRImap;
   scene.environment = HDRImap;
   HDRImap.dispose();
   pmremGenerator.dispose();

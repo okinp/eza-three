@@ -2,7 +2,9 @@ import {
   BufferGeometry,
   InstancedMesh,
   Line,
+  Material,
   Mesh,
+  MeshBasicMaterial,
   MeshPhysicalMaterial,
   Object3D,
   PerspectiveCamera,
@@ -11,19 +13,19 @@ import {
   WebGLRenderer,
 } from "three";
 
-interface iDropletMesh {
+interface iDropletMesh<T extends Material | Material[]> {
   addDroplet: (position: Vector3, normal: Vector3) => void;
-  dropletMesh: InstancedMesh<BufferGeometry, MeshPhysicalMaterial>;
+  dropletMesh: InstancedMesh<BufferGeometry, T>;
 }
 
 
-export interface iDropletMeshes {
-  xs: iDropletMesh;
-  sm: iDropletMesh;
-  md: iDropletMesh;
-  xl: iDropletMesh;
-  xxl: iDropletMesh;
-  xxxl: iDropletMesh;
+export interface iDropletMeshes<T extends Material | Material[]> {
+  xs: iDropletMesh<T>;
+  sm: iDropletMesh<T>;
+  md: iDropletMesh<T>;
+  xl: iDropletMesh<T>;
+  xxl: iDropletMesh<T>;
+  xxxl: iDropletMesh<T>;
 }
 
 export interface Store {
@@ -39,7 +41,7 @@ export interface Store {
     frontLabel: MeshPhysicalMaterial;
     liquid: MeshPhysicalMaterial;
     water?: MeshPhysicalMaterial;
-    dropletMaterial: MeshPhysicalMaterial;
+    dropletMaterial: MeshBasicMaterial;
   };
   domNodes: {
     canvas: HTMLElement;
@@ -59,14 +61,14 @@ export interface Store {
     liquid: Mesh;
     water?: Mesh;
   };
-  selectedDropSize: keyof iDropletMeshes,
+  selectedDropSize: keyof iDropletMeshes<MeshBasicMaterial>,
   dropletMeshes: {
-    xs: iDropletMesh;
-    sm: iDropletMesh;
-    md: iDropletMesh;
-    xl: iDropletMesh;
-    xxl: iDropletMesh;
-    xxxl: iDropletMesh;
+    xs: iDropletMesh<MeshBasicMaterial>;
+    sm: iDropletMesh<MeshBasicMaterial>;
+    md: iDropletMesh<MeshBasicMaterial>;
+    xl: iDropletMesh<MeshBasicMaterial>;
+    xxl: iDropletMesh<MeshBasicMaterial>;
+    xxxl: iDropletMesh<MeshBasicMaterial>;
   };
   isReady: boolean;
 }
