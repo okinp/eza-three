@@ -49,7 +49,7 @@ const filePath = "/wp-content/themes/eza_theme/3d";
 const envmapFilename = "studio_country_hall_1k";
 
 let bottleName = container?.dataset.file ?? "finelager";
-bottleName = "finelager2";
+bottleName = "finelager";
 
 const windowScroll = getScrollCallback((currentScroll, previousScroll) => {
   if (state.store) {
@@ -289,8 +289,6 @@ export async function init(): Promise<boolean> {
         },
         isReady: true,
       };
-
-      console.log(state.store);
 
 
       enableDragToRotate(state.store.domNodes.canvas, state.store.bottleObject);
