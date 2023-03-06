@@ -41,9 +41,11 @@ export function createInstancedDropletMesh(droplet: Mesh, layer = 0, maxCount = 
     if (dropletMesh.count < maxCount ){
       const _n = normal.copy(normal);
       const _p = position.copy(position);
+      _p.add(normal.multiplyScalar(2));
       _n.add(_p);
+
       const idx = dropletMesh.count;
-      const scale = 0.0008 * Math.random() + 0.004
+      const scale = 0.0008 * Math.random() + 0.08
       dummy.scale.set(scale, scale, scale)
       dummy.position.copy(_p);
       dummy.lookAt(_n);

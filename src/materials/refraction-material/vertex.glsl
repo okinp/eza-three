@@ -6,5 +6,5 @@ void main() {
 	worldNormal = normalize( modelViewMatrix * vec4(normal, 0.)).xyz;
 	viewDirection = normalize(worldPosition.xyz - cameraPosition);;
 
-	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * instanceMatrix * vec4(position, 1.0);
 }

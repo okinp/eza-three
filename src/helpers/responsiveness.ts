@@ -12,16 +12,16 @@ export function resizeRendererToDisplaySize(renderer: WebGLRenderer, cameras: Pe
       camera.aspect = width/height;
       camera.updateProjectionMatrix();
     });
-    const dpr = Math.min(devicePixelRatio, 2);
+    // const dpr = Math.min(devicePixelRatio, 2);
     fbos.forEach(fbo => fbo.setSize(
-      width*dpr,
-      height*dpr
+      width,
+      height
     ))
 
     meshes.forEach(mesh => {
       mesh.dropletMesh.material.uniforms.resolution.value = [
-        width*dpr,
-        height*dpr
+        width,
+        height
       ];
     })
   }

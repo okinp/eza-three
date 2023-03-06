@@ -5,11 +5,11 @@ uniform vec2 resolution;
 varying vec3 worldNormal;
 varying vec3 viewDirection;
 
-float ior = 1.5;
+float ior = 1.7;
 float a = 0.33;
 
 vec3 fogColor = vec3(1.0);
-vec3 reflectionColor = vec3(1.0);
+vec3 reflectionColor = vec3(1);
 
 float fresnelFunc(vec3 viewDirection, vec3 worldNormal) {
 	return pow( 1.0 + dot( viewDirection, worldNormal), 3.0 );
@@ -34,7 +34,7 @@ void main() {
 
 	// calculate fresnel
 	float fresnel = fresnelFunc(viewDirection, normal);
-
+  fresnel *= 0.001f;
 	vec4 color = tex;
 
 	// apply fresnel

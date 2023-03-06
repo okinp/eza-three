@@ -263,12 +263,13 @@ export async function init(): Promise<boolean> {
       const geometry = new BufferGeometry();
       geometry.setFromPoints([new Vector3(), new Vector3()]);
       const line = new Line(geometry, new LineBasicMaterial());
+      line.layers.set(1);
       scene.add(line);
 
       const refractionMaterial = new RefractionMaterial({
         envMap: envFbo.texture,
         backfaceMap: backfaceFbo.texture,
-        resolution: [canvas.clientWidth * dpr, canvas.clientHeight * dpr]
+        resolution: [canvas.clientWidth, canvas.clientHeight]
       })
 
       const backfaceMaterial = new BackfaceMaterial();
@@ -362,17 +363,14 @@ export function animate() {
     renderer.setRenderTarget(fbo.backface);
     renderer.clearDepth();
     renderer.render(scene, camera);
+    renderer.clearDepth();
 
     //render env to screen
     renderer.setRenderTarget(null);
-    renderer.clearDepth();
+    // renderer.clearDepth();
     Object.values(dropletMeshes).forEach(mesh => {
       mesh.dropletMesh.material = materials.refraction;
     })
-
-    renderer.render(scene, camera);
-
-
 
     renderer.render(scene, camera);
     windowScroll();
