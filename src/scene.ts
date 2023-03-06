@@ -1,26 +1,26 @@
 import {
+  BoxGeometry,
   BufferGeometry,
   Euler,
+  Event as ThreeEvent,
   Face,
   Intersection,
   Line,
   LineBasicMaterial,
   Material,
   Mesh,
+  MeshNormalMaterial,
   MeshPhysicalMaterial,
   Object3D,
   Quaternion,
   Scene,
-  Event as ThreeEvent,
   Vector3,
-  BoxGeometry,
-  MeshNormalMaterial,
+  WebGLRenderTarget
 } from "three";
 
 import {
   createCamera,
   createInstancedDropletMesh,
-  dropletMaterial,
   createRenderer,
   enableDragToRotate,
   getScrollCallback,
@@ -30,6 +30,9 @@ import {
   observeResize,
   toRadians,
 } from "./helpers";
+
+import BackfaceMaterial from "./materials/backface-material";
+import RefractionMaterial from "./materials/refraction-material";
 
 const containerId = "CanvasFrame";
 const canvasId = "scene";
@@ -141,8 +144,20 @@ export async function init(): Promise<boolean> {
   const domNodes = { canvas, container, word1, word2 };
   const renderer = createRenderer(canvas);
   const camera = createCamera(canvas);
+  camera.layers.enable(0);
+  camera.layers.enable(1);
 
-  observeResize(renderer, camera);
+  const fboCamera = createCamera(canvas);
+  fboCamera.layers.set(0);
+
+  const dpr = Math.min(devicePixelRatio, 2);
+  const envFbo = new WebGLRenderTarget(dpr*canvas.clientWidth, dpr*canvas.clientHeight);
+  const backfaceFbo = new WebGLRenderTarget(dpr*canvas.clientWidth, dpr*canvas.clientHeight);
+
+
+
+  
+
 
   const scene = new Scene();
 
@@ -185,7 +200,6 @@ export async function init(): Promise<boolean> {
       const backLabelMesh = gltf.scene.children[5] as Mesh;
       const backLabelMaterial = backLabelMesh.material as MeshPhysicalMaterial;
 
-      const outerMesh = gltf.scene.children[6] as Mesh;
 
       if (bottleName in bottleParams) {
         const params = bottleParams[bottleName as keyof bottleParams];
@@ -209,12 +223,12 @@ export async function init(): Promise<boolean> {
 
       const xxxl = drops.scene.children[0] as Mesh;
 
-      const xsMesh = createInstancedDropletMesh(xs, 500);
-      const smMesh = createInstancedDropletMesh(sm, 500);
-      const mdMesh = createInstancedDropletMesh(md, 500);
-      const xlMesh = createInstancedDropletMesh(xl, 500);
-      const xxlMesh = createInstancedDropletMesh(xxl, 500);
-      const xxxlMesh = createInstancedDropletMesh(xxxl, 1000);
+      const xsMesh = createInstancedDropletMesh(xs, 1, 500);
+      const smMesh = createInstancedDropletMesh(sm, 1, 500);
+      const mdMesh = createInstancedDropletMesh(md, 1, 500);
+      const xlMesh = createInstancedDropletMesh(xl, 1, 500);
+      const xxlMesh = createInstancedDropletMesh(xxl, 1, 500);
+      const xxxlMesh = createInstancedDropletMesh(xxxl, 1, 1000);
 
       console.log(xsMesh);
 
@@ -225,7 +239,6 @@ export async function init(): Promise<boolean> {
         topLabelMesh,
         frontLabelMesh,
         backLabelMesh,
-        outerMesh,
         xsMesh.dropletMesh,
         smMesh.dropletMesh,
         mdMesh.dropletMesh,
@@ -252,6 +265,14 @@ export async function init(): Promise<boolean> {
       const line = new Line(geometry, new LineBasicMaterial());
       scene.add(line);
 
+      const refractionMaterial = new RefractionMaterial({
+        envMap: envFbo.texture,
+        backfaceMap: backfaceFbo.texture,
+        resolution: [canvas.clientWidth * dpr, canvas.clientHeight * dpr]
+      })
+
+      const backfaceMaterial = new BackfaceMaterial();
+
       state.store = {
         rootObject,
         bottleObject,
@@ -264,12 +285,18 @@ export async function init(): Promise<boolean> {
           backLabel: backLabelMaterial,
           topLabel: topLabelMaterial,
           cap: kapakiMaterial,
-          dropletMaterial,
+          backface: backfaceMaterial,
+          refraction: refractionMaterial
         },
         domNodes,
+        fbo: {
+          env: envFbo,
+          backface: backfaceFbo
+        },
         scene,
         renderer,
         camera,
+        fboCamera,
         meshes: {
           cap: capMesh,
           bottle: bottleMesh,
@@ -290,6 +317,10 @@ export async function init(): Promise<boolean> {
         isReady: true,
       };
 
+      observeResize(renderer, [camera, fboCamera], [envFbo, backfaceFbo], Object.values(state.store.dropletMeshes));
+
+      console.log(state.store);
+
 
       enableDragToRotate(state.store.domNodes.canvas, state.store.bottleObject);
       setupGui();
@@ -306,8 +337,11 @@ export async function init(): Promise<boolean> {
 export function animate() {
   requestAnimationFrame(animate);
   if (state.store) {
-    const { camera, renderer, scene, meshes 
+    const { camera, fboCamera, renderer, scene, meshes, materials, fbo, dropletMeshes
   } = state.store;
+
+    renderer.clear();
+
     raycast(
       Object.values(meshes).filter((m) => m.name === "bottle") as Mesh<
         BufferGeometry,
@@ -316,6 +350,30 @@ export function animate() {
       camera,
       intersectCb
     );
+    
+    //Render env to fbo
+    renderer.setRenderTarget(fbo.env);
+    renderer.render(scene, fboCamera);
+
+    //Render drops backfaces to fbo
+    Object.values(dropletMeshes).forEach(mesh => {
+      mesh.dropletMesh.material = materials.backface;
+    })
+    renderer.setRenderTarget(fbo.backface);
+    renderer.clearDepth();
+    renderer.render(scene, camera);
+
+    //render env to screen
+    renderer.setRenderTarget(null);
+    renderer.clearDepth();
+    Object.values(dropletMeshes).forEach(mesh => {
+      mesh.dropletMesh.material = materials.refraction;
+    })
+
+    renderer.render(scene, camera);
+
+
+
     renderer.render(scene, camera);
     windowScroll();
   }

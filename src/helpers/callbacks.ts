@@ -25,7 +25,7 @@ export function getScrollCallback(cb: (current: number, previous: number) => voi
         //@ts-ignore
         window.luxy.init({
           wrapper: '#smooth',
-          wrapperSpeed: 0.065,
+          wapperSpeed: 0.065,
         });
       }
 

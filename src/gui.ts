@@ -1,6 +1,6 @@
 import GUI from 'lil-gui'
 import { MeshBasicMaterial } from 'three';
-import { createPhysicalMaterialGui, createBasicMaterialGui } from './helpers';
+import { createPhysicalMaterialGui } from './helpers';
 import state, { iDropletMeshes } from "./store";
 
 
@@ -23,7 +23,7 @@ export function setupGui( ){
       }
     })
 
-    const dropletParams = createBasicMaterialGui('Droplets', state.store.materials.dropletMaterial, gui);
+    // const dropletParams = createBasicMaterialGui('Droplets', state.store.materials.dropletMaterial, gui);
     
     const bottleParams = createPhysicalMaterialGui('BottleMaterial', state.store.materials.bottle, gui)
     const liquidParams = createPhysicalMaterialGui('LiquidMaterial', state.store.materials.liquid, gui);
@@ -38,7 +38,7 @@ export function setupGui( ){
       dropSize: {
         size: 'xs'
       },
-      droplet: dropletParams,
+      // droplet: dropletParams,
       bottle: bottleParams,
       liquid: liquidParams,
       kapaki: kapakiParams,

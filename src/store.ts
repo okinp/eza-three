@@ -9,11 +9,15 @@ import {
   Object3D,
   PerspectiveCamera,
   Scene,
+  ShaderMaterial,
   Vector3,
   WebGLRenderer,
+  WebGLRenderTarget,
 } from "three";
 
-interface iDropletMesh<T extends Material | Material[]> {
+import { BackfaceMaterial, RefractionMaterial } from "./materials/index";
+
+export interface iDropletMesh<T extends Material | Material[]> {
   addDroplet: (position: Vector3, normal: Vector3) => void;
   dropletMesh: InstancedMesh<BufferGeometry, T>;
 }
@@ -41,7 +45,9 @@ export interface Store {
     frontLabel: MeshPhysicalMaterial;
     liquid: MeshPhysicalMaterial;
     water?: MeshPhysicalMaterial;
-    dropletMaterial: MeshBasicMaterial;
+    backface: BackfaceMaterial;
+    refraction: RefractionMaterial;
+    dropletMaterial?: MeshBasicMaterial;
   };
   domNodes: {
     canvas: HTMLElement;
@@ -49,9 +55,14 @@ export interface Store {
     word1: HTMLElement;
     word2: HTMLElement;
   };
+  fbo: {
+    env: WebGLRenderTarget,
+    backface: WebGLRenderTarget
+  },
   scene: Scene;
   renderer: WebGLRenderer;
   camera: PerspectiveCamera;
+  fboCamera: PerspectiveCamera;
   meshes: {
     bottle: Mesh;
     cap: Mesh;
@@ -61,14 +72,14 @@ export interface Store {
     liquid: Mesh;
     water?: Mesh;
   };
-  selectedDropSize: keyof iDropletMeshes<MeshBasicMaterial>,
+  selectedDropSize: keyof iDropletMeshes<ShaderMaterial>,
   dropletMeshes: {
-    xs: iDropletMesh<MeshBasicMaterial>;
-    sm: iDropletMesh<MeshBasicMaterial>;
-    md: iDropletMesh<MeshBasicMaterial>;
-    xl: iDropletMesh<MeshBasicMaterial>;
-    xxl: iDropletMesh<MeshBasicMaterial>;
-    xxxl: iDropletMesh<MeshBasicMaterial>;
+    xs: iDropletMesh<ShaderMaterial>;
+    sm: iDropletMesh<ShaderMaterial>;
+    md: iDropletMesh<ShaderMaterial>;
+    xl: iDropletMesh<ShaderMaterial>;
+    xxl: iDropletMesh<ShaderMaterial>;
+    xxxl: iDropletMesh<ShaderMaterial>;
   };
   isReady: boolean;
 }

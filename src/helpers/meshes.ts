@@ -6,6 +6,7 @@ import {
   Vector3,
   Object3D,
   MeshBasicMaterial,
+  ShaderMaterial,
 } from "three";
 
 
@@ -24,12 +25,13 @@ export const dropletMaterial = new MeshBasicMaterial({ color: 0xffffff, refracti
 // dropletMaterial.transmission = 1;
 // dropletMaterial.thickness = 2.4;
 
-export function createInstancedDropletMesh(droplet: Mesh, maxCount = 2000) {
+export function createInstancedDropletMesh(droplet: Mesh, layer = 0, maxCount = 2000) {
 
   const dropletGeometry = droplet.geometry.clone();
   dropletGeometry.applyMatrix4(defaultTransform);
 
-  const dropletMesh = new InstancedMesh(dropletGeometry, dropletMaterial, maxCount);
+  const dropletMesh = new InstancedMesh(dropletGeometry, new ShaderMaterial, maxCount);
+  dropletMesh.layers.set(layer);
   dropletMesh.instanceMatrix.setUsage(DynamicDrawUsage);
   dropletMesh.count = 0;
 
@@ -39,14 +41,18 @@ export function createInstancedDropletMesh(droplet: Mesh, maxCount = 2000) {
     if (dropletMesh.count < maxCount ){
       const _n = normal.copy(normal);
       const _p = position.copy(position);
+      console.log(_p);
+      console.log(_n);
+      
       _n.add(_p);
       const idx = dropletMesh.count;
-      const scale = 0.0008 * Math.random() + 0.004
-      dummy.scale.set(scale, scale, scale)
+      // const scale = 0.0008 * Math.random() + 0.004
+      // dummy.scale.set(scale, scale, scale)
       dummy.position.copy(_p);
       dummy.lookAt(_n);
       dummy.updateMatrix();
       dropletMesh.setMatrixAt(idx, dummy.matrix);
+      dropletMesh.scale.set(0.02,0.02, 0.02)
       dropletMesh.instanceMatrix.needsUpdate = true;
       dropletMesh.count +=1;
     }
