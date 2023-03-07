@@ -363,15 +363,17 @@ export function animate() {
     renderer.setRenderTarget(fbo.backface);
     renderer.clearDepth();
     renderer.render(scene, camera);
+
+    // render env to screen
+    renderer.setRenderTarget(null);
+    renderer.render(scene, fboCamera);
     renderer.clearDepth();
 
     //render env to screen
     renderer.setRenderTarget(null);
-    // renderer.clearDepth();
     Object.values(dropletMeshes).forEach(mesh => {
       mesh.dropletMesh.material = materials.refraction;
     })
-
     renderer.render(scene, camera);
     windowScroll();
   }

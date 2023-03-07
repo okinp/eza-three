@@ -16,7 +16,7 @@ const defaultTransform = new Matrix4()
   .multiply(new Matrix4().makeScale(7, 7, 7));
 
 
-export const dropletMaterial = new MeshBasicMaterial({ color: 0xffffff, refractionRatio: 0.95 });
+// export const dropletMaterial = new MeshBasicMaterial({ color: 0xffffff, refractionRatio: 0.95 });
 // dropletMaterial.opacity = 0.05;
 // dropletMaterial.ior = 1.042406;
 // dropletMaterial.emissiveIntensity = 0.442;
@@ -41,7 +41,7 @@ export function createInstancedDropletMesh(droplet: Mesh, layer = 0, maxCount = 
     if (dropletMesh.count < maxCount ){
       const _n = normal.copy(normal);
       const _p = position.copy(position);
-      _p.add(normal.multiplyScalar(2));
+      // _p.add(normal.multiplyScalar(2));
       _n.add(_p);
 
       const idx = dropletMesh.count;

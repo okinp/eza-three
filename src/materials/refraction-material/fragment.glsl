@@ -5,7 +5,7 @@ uniform vec2 resolution;
 varying vec3 worldNormal;
 varying vec3 viewDirection;
 
-float ior = 1.7;
+float ior = 1.4;
 float a = 0.33;
 
 vec3 fogColor = vec3(1.0);

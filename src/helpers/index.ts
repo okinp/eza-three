@@ -12,6 +12,6 @@ export { loadTexture, loadTextures, loadGLTFModel, loadFont, loadEnvMapToScene  
 
 export { rotate, bounce } from "./animationUtils";
 
-export { createInstancedDropletMesh, dropletMaterial } from "./meshes";
+export { createInstancedDropletMesh } from "./meshes";
 
 export { default as intersectionHelper} from "./intersectionHelper";
