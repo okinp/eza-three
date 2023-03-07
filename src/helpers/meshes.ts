@@ -5,7 +5,6 @@ import {
   DynamicDrawUsage,
   Vector3,
   Object3D,
-  MeshBasicMaterial,
   ShaderMaterial,
 } from "three";
 
