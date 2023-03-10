@@ -6,6 +6,7 @@ import {
   // Intersection,
   // Material,
   Mesh,
+  MeshStandardMaterial,
   MeshPhysicalMaterial,
   Object3D,
   Quaternion,
@@ -31,7 +32,7 @@ import {
 const containerId = "CanvasFrame";
 const canvasId = "scene";
 
-import { bottleParams } from "./materials";
+// import { bottleParams } from "./materials";
 // import { setupGui } from "./gui";
 
 // const arrowHelper = new ArrowHelper(
@@ -143,38 +144,43 @@ export async function init(): Promise<boolean> {
 
       container.classList.remove("loading");
 
-      const capMesh = gltf.scene.children[1] as Mesh;
-      const kapakiMaterial = capMesh.material as MeshPhysicalMaterial;
+      // console.log(gltf);
+      // return;
 
+      
       const bottleMesh = gltf.scene.children[0] as Mesh;
-      const bottleMaterial = bottleMesh.material as MeshPhysicalMaterial;
-      bottleMaterial.map = null;
-      bottleMaterial.alphaMap = null;
+      const bottleMaterial = bottleMesh.material as MeshStandardMaterial;
+      // bottleMaterial.map = null;
+      // bottleMaterial.alphaMap = null;
+      
+      const capMesh = gltf.scene.children[1] as Mesh;
+      const kapakiMaterial = capMesh.material as MeshStandardMaterial;
+
+      const topLabelMesh = gltf.scene.children[2] as Mesh;
+      const topLabelMaterial = topLabelMesh.material as MeshStandardMaterial;
 
       const liquidMesh = gltf.scene.children[3] as Mesh;
       const liquidMaterial = liquidMesh.material as MeshPhysicalMaterial;
       liquidMaterial.map = null;
       liquidMaterial.alphaMap = null;
 
-      const topLabelMesh = gltf.scene.children[2] as Mesh;
-      const topLabelMaterial = topLabelMesh.material as MeshPhysicalMaterial;
 
       const frontLabelMesh = gltf.scene.children[4] as Mesh;
       const frontLabelMaterial =
-        frontLabelMesh.material as MeshPhysicalMaterial;
+        frontLabelMesh.material as MeshStandardMaterial;
 
       const backLabelMesh = gltf.scene.children[5] as Mesh;
-      const backLabelMaterial = backLabelMesh.material as MeshPhysicalMaterial;
+      const backLabelMaterial = backLabelMesh.material as MeshStandardMaterial;
 
-      if (bottleName in bottleParams) {
-        const params = bottleParams[bottleName as keyof bottleParams];
-        bottleMaterial.setValues(params.bottle);
-        liquidMaterial.setValues(params.liquid);
-        kapakiMaterial.setValues(params.kapaki);
-        topLabelMaterial.setValues(params.topLabel);
-        frontLabelMaterial.setValues(params.frontLabel);
-        backLabelMaterial.setValues(params.backLabel);
-      }
+      // if (bottleName in bottleParams) {
+      //   const params = bottleParams[bottleName as keyof bottleParams];
+      //   bottleMaterial.setValues(params.bottle);
+      //   liquidMaterial.setValues(params.liquid);
+      //   kapakiMaterial.setValues(params.kapaki);
+      //   topLabelMaterial.setValues(params.topLabel);
+      //   frontLabelMaterial.setValues(params.frontLabel);
+      //   backLabelMaterial.setValues(params.backLabel);
+      // }
 
       // const xs = drops.scene.children[3] as Mesh;
 

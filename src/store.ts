@@ -3,6 +3,7 @@ import {
   InstancedMesh,
   Mesh,
   MeshBasicMaterial,
+  MeshStandardMaterial,
   MeshPhysicalMaterial,
   Object3D,
   PerspectiveCamera,
@@ -30,14 +31,14 @@ export interface Store {
   rootObject: Object3D;
   bottleObject: Object3D;
   materials: {
-    bottle: MeshPhysicalMaterial;
-    cap: MeshPhysicalMaterial;
-    topLabel: MeshPhysicalMaterial;
-    backLabel: MeshPhysicalMaterial;
-    frontLabel: MeshPhysicalMaterial;
+    bottle: MeshStandardMaterial;
+    cap: MeshStandardMaterial;
+    topLabel: MeshStandardMaterial;
+    backLabel: MeshStandardMaterial;
+    frontLabel: MeshStandardMaterial;
     liquid: MeshPhysicalMaterial;
     water?: MeshPhysicalMaterial;
-    dropletMaterial: MeshBasicMaterial;
+    dropletMaterial?: MeshBasicMaterial;
   };
   domNodes: {
     canvas: HTMLElement;
