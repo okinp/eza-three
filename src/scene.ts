@@ -1,29 +1,25 @@
 import {
-  // ArrowHelper,
-  // BufferGeometry,
+  AmbientLight,
+  PointLight,
+  DirectionalLight,
   Euler,
-  // Face,
-  // Intersection,
-  // Material,
   Mesh,
   MeshStandardMaterial,
   MeshPhysicalMaterial,
   Object3D,
   Quaternion,
   Scene,
-  // Event as ThreeEvent,
-  // Vector3,
+  MeshBasicMaterial,
 } from "three";
 
 import {
   createCamera,
-  // createInstancedDropletMesh,
   dropletMaterial,
   createRenderer,
   enableDragToRotate,
   getScrollCallback,
-  // intersectionHelper,
   loadEnvMapToScene,
+  loadTextureCube,
   loadGLTFModel,
   observeResize,
   toRadians,
@@ -51,7 +47,7 @@ const word1 = document.getElementById("js-word1");
 const word2 = document.getElementById("js-word2");
 
 const filePath = "/wp-content/themes/eza_theme/3d";
-const envmapFilename = "studio_country_hall_1k";
+// const envmapFilename = "studio_country_hall_1k";
 
 const bottleName = container?.dataset.file ?? "finelager";
 
@@ -75,7 +71,6 @@ const windowScroll = getScrollCallback((currentScroll, previousScroll) => {
   }
 });
 
-
 // const { onPointerMove, raycast } = intersectionHelper();
 
 // if (canvas){
@@ -98,7 +93,7 @@ const bottleObject = new Object3D();
 //     n.copy(objectNorm);
 //     intersectionData.normal.copy(objectNorm);
 //     n.transformDirection(intersection.object.matrixWorld)
-  
+
 //     arrowHelper.setDirection(n);
 //     arrowHelper.setColor(0x0000ff);
 //     arrowHelper.setLength(1.3)
@@ -113,9 +108,31 @@ const bottleObject = new Object3D();
 //   }
 // }
 
+function addLights(scene: Scene) {
+  const ambientLight = new AmbientLight("#aabbdd", 0.35);
+  scene.add(ambientLight);
+  const backLight = new PointLight(0x99ff66, 10, 40);
+  backLight.position.set(65, 0, 20);
+  scene.add(backLight);
+  const pointLight = new PointLight(0xffff99, 8, 40);
+  pointLight.position.set(45, 30, 5);
+  scene.add(pointLight);
+  var directionalLight = new DirectionalLight(0xffffff, 1);
+  directionalLight.castShadow = true;
+  directionalLight.shadow.mapSize.width = 1024; // default
+  directionalLight.shadow.mapSize.height = 1024; // default
+  directionalLight.shadow.camera.near = 0.5; // default
+  directionalLight.shadow.camera.far = 500; // default
+  scene.add(directionalLight);
+
+  const lightTargetObject = new Object3D();
+  scene.add(lightTargetObject);
+  directionalLight.target = lightTargetObject;
+  directionalLight.position.set(-2000, 1000, -100);
+  lightTargetObject.position.set(0, -0, 100);
+}
 
 export async function init(): Promise<boolean> {
-
   if (!container || !canvas || !word1 || !word2) {
     return false;
   }
@@ -130,155 +147,70 @@ export async function init(): Promise<boolean> {
 
   scene.add(rootObject);
 
+  addLights(scene);
+
   try {
     await Promise.all([
       loadGLTFModel(`${filePath}/glb/${bottleName}.glb`, true),
-      loadEnvMapToScene(
-        `${filePath}/envmap/${envmapFilename}.hdr`,
-        scene,
-        renderer
-      ),
-    ]).then(([gltf]) => {
-
+      loadTextureCube("/wp-content/themes/eza_theme/3d/cubemap/", [
+        "px.jpg",
+        "nx.jpg",
+        "py.jpg",
+        "ny.jpg",
+        "pz.jpg",
+        "nz.jpg",
+      ]),
+    ]).then(([gltf, textureCube]) => {
       // console.log(drops);
 
+      scene.environment = textureCube;
       container.classList.remove("loading");
 
       // console.log(gltf);
       // return;
 
-      
-      const bottleMesh = gltf.scene.children[0] as Mesh;
-      const bottleMaterial = bottleMesh.material as MeshStandardMaterial;
-      // bottleMaterial.map = null;
-      // bottleMaterial.alphaMap = null;
-      
-      const capMesh = gltf.scene.children[1] as Mesh;
-      const kapakiMaterial = capMesh.material as MeshStandardMaterial;
+      // const meshes = 
 
-      const topLabelMesh = gltf.scene.children[2] as Mesh;
-      const topLabelMaterial = topLabelMesh.material as MeshStandardMaterial;
+      gltf.scene.traverse((child) => {
+        const mesh = child as Mesh;
+        if (mesh.isMesh) {
+          mesh.frustumCulled = false;
+          (mesh.material as MeshBasicMaterial).envMap = textureCube;
+          // bottleObject.add(mesh);
+        }
+      });
 
-      const liquidMesh = gltf.scene.children[3] as Mesh;
-      const liquidMaterial = liquidMesh.material as MeshPhysicalMaterial;
-      liquidMaterial.map = null;
-      liquidMaterial.alphaMap = null;
+      bottleObject.add(...gltf.scene.children)
 
-
-      const frontLabelMesh = gltf.scene.children[4] as Mesh;
-      const frontLabelMaterial =
-        frontLabelMesh.material as MeshStandardMaterial;
-
-      const backLabelMesh = gltf.scene.children[5] as Mesh;
-      const backLabelMaterial = backLabelMesh.material as MeshStandardMaterial;
-
-      // if (bottleName in bottleParams) {
-      //   const params = bottleParams[bottleName as keyof bottleParams];
-      //   bottleMaterial.setValues(params.bottle);
-      //   liquidMaterial.setValues(params.liquid);
-      //   kapakiMaterial.setValues(params.kapaki);
-      //   topLabelMaterial.setValues(params.topLabel);
-      //   frontLabelMaterial.setValues(params.frontLabel);
-      //   backLabelMaterial.setValues(params.backLabel);
-      // }
-
-      // const xs = drops.scene.children[3] as Mesh;
-
-      // const sm = drops.scene.children[4] as Mesh;
-
-      // const md = drops.scene.children[5] as Mesh;
-
-      // const xl = drops.scene.children[1] as Mesh;
-      
-      // const xxl = drops.scene.children[2] as Mesh;
-      
-      // const xxxl = drops.scene.children[0] as Mesh;
-
-
-      // const xsMesh = createInstancedDropletMesh(xs, 300);
-      // const smMesh = createInstancedDropletMesh(sm, 30);
-      // const mdMesh = createInstancedDropletMesh(md, 30);
-      // const xlMesh = createInstancedDropletMesh(xl, 30);
-      // const xxlMesh = createInstancedDropletMesh(xxl, 30);
-      // const xxxlMesh = createInstancedDropletMesh(xxxl, 50);
-
-      // console.log(xsMesh);
-
-      bottleObject.add(
-        liquidMesh,
-        bottleMesh,
-        capMesh,
-        topLabelMesh,
-        frontLabelMesh,
-        backLabelMesh,
-        // arrowHelper,
-        // xsMesh.dropletMesh,
-        // smMesh.dropletMesh,
-        // mdMesh.dropletMesh,
-        // xlMesh.dropletMesh,
-        // xxlMesh.dropletMesh,
-        // xxxlMesh.dropletMesh
-      );
+      // scene.add(gltf.scene);
 
       bottleObject.position.set(0, 0.5, 0);
-      
+
+      bottleObject.castShadow = true;
+      bottleObject.receiveShadow = true;
+
       const scaleFactor = canvas.clientWidth < 1024 ? 1.6 : 2;
       bottleObject.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
       bottleObject.rotation.set(0, 0, Math.PI / 9);
 
+      // bottleObject.add(gltf.scene);
+
       rootObject.add(bottleObject);
       rootObject.position.y = 1;
-
-
 
       state.store = {
         rootObject,
         bottleObject,
-        materials: {
-          bottle: bottleMaterial,
-          liquid: liquidMaterial,
-          frontLabel: frontLabelMaterial,
-          backLabel: backLabelMaterial,
-          topLabel: topLabelMaterial,
-          cap: kapakiMaterial,
-          dropletMaterial
-        },
         domNodes,
         scene,
         renderer,
         camera,
-        meshes: {
-          cap: capMesh,
-          bottle: bottleMesh,
-          liquid: liquidMesh,
-          topLabel: topLabelMesh,
-          frontLabel: frontLabelMesh,
-          backLabel: backLabelMesh,
-        },
-        // selectedDropSize: 'xs',
-        // dropletMeshes: {
-        //   xs: xsMesh,
-        //   sm: smMesh,
-        //   md: mdMesh,
-        //   xl: xlMesh,
-        //   xxl: xxlMesh,
-        //   xxxl: xxxlMesh
-        // },
-        isReady: true,      // canvas.addEventListener('mousedown', () => {
-      //   if (intersectionData.isIntersecting && state.store?.selectedDropSize){
-      //     state.store.dropletMeshes[state.store.selectedDropSize].addDroplet(intersectionData.position, intersectionData.normal);
-      //   }
-      // })
+        isReady: true,
       };
       enableDragToRotate(state.store.domNodes.canvas, state.store.bottleObject);
-      // canvas.addEventListener('mousedown', () => {
-      //   if (intersectionData.isIntersecting && state.store?.selectedDropSize){
-      //     state.store.dropletMeshes[state.store.selectedDropSize].addDroplet(intersectionData.position, intersectionData.normal);
-      //   }
-      // })
     });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     return false;
   }
@@ -289,7 +221,6 @@ export async function init(): Promise<boolean> {
 export function animate() {
   requestAnimationFrame(animate);
   if (state.store) {
-    // raycast(Object.values(state.store.meshes).filter( m => m.name !== 'liquid') as Mesh<BufferGeometry, Material>[], state.store.camera, intersectCb );
     state.store.renderer.render(state.store.scene, state.store.camera);
     windowScroll();
   }

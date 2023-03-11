@@ -30,16 +30,6 @@ export interface iDropletMeshes {
 export interface Store {
   rootObject: Object3D;
   bottleObject: Object3D;
-  materials: {
-    bottle: MeshStandardMaterial;
-    cap: MeshStandardMaterial;
-    topLabel: MeshStandardMaterial;
-    backLabel: MeshStandardMaterial;
-    frontLabel: MeshStandardMaterial;
-    liquid: MeshPhysicalMaterial;
-    water?: MeshPhysicalMaterial;
-    dropletMaterial?: MeshBasicMaterial;
-  };
   domNodes: {
     canvas: HTMLElement;
     container: HTMLElement;
@@ -49,15 +39,6 @@ export interface Store {
   scene: Scene;
   renderer: WebGLRenderer;
   camera: PerspectiveCamera;
-  meshes: {
-    bottle: Mesh;
-    cap: Mesh;
-    topLabel: Mesh;
-    backLabel: Mesh;
-    frontLabel: Mesh;
-    liquid: Mesh;
-    water?: Mesh;
-  };
   // selectedDropSize: keyof iDropletMeshes,
   // dropletMeshes: {
   //   xs: iDropletMesh;

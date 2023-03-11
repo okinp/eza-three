@@ -17,7 +17,7 @@ export function createRenderer(canvas: HTMLElement) {
   renderer.shadowMap.enabled = true;
   renderer.outputEncoding = sRGBEncoding;
   renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1;
+  renderer.toneMappingExposure = 1.6;
   renderer.physicallyCorrectLights = true;
   return renderer;
 }

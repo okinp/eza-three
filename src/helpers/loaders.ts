@@ -1,4 +1,4 @@
-import { HalfFloatType, PMREMGenerator, Scene, Texture, TextureEncoding, TextureLoader, WebGLRenderer } from "three";
+import { CubeTextureLoader, CubeTexture, HalfFloatType, PMREMGenerator, Scene, Texture, TextureEncoding, TextureLoader, WebGLRenderer } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
@@ -68,4 +68,12 @@ export async function loadEnvMapToScene(
   scene.environment = HDRImap;
   HDRImap.dispose();
   pmremGenerator.dispose();
+}
+
+export function loadTextureCube(path: string, files: string[] ) : Promise<CubeTexture> {
+  const cubeTextureLoader = new CubeTextureLoader();
+  cubeTextureLoader.setPath(path);
+  return new Promise(resolve => {
+    cubeTextureLoader.load(files, resolve )
+  })
 }

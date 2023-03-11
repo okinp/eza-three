@@ -24,9 +24,6 @@
     "vite": "^4.0.4"
   },
   "dependencies": {
-    "lamina": "^1.1.23",
-    "lil-gui": "^0.18.0",
-    "postprocessing": "^6.30.0",
-    "three": "0.148.0"
+    "three": "0.145.0"
   }
 }
