@@ -1,10 +1,7 @@
 import {
   BufferGeometry,
   InstancedMesh,
-  Mesh,
   MeshBasicMaterial,
-  MeshStandardMaterial,
-  MeshPhysicalMaterial,
   Object3D,
   PerspectiveCamera,
   Scene,

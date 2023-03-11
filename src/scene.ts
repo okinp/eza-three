@@ -4,8 +4,6 @@ import {
   DirectionalLight,
   Euler,
   Mesh,
-  MeshStandardMaterial,
-  MeshPhysicalMaterial,
   Object3D,
   Quaternion,
   Scene,
@@ -14,11 +12,9 @@ import {
 
 import {
   createCamera,
-  dropletMaterial,
   createRenderer,
   enableDragToRotate,
   getScrollCallback,
-  loadEnvMapToScene,
   loadTextureCube,
   loadGLTFModel,
   observeResize,
