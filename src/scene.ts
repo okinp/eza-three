@@ -8,7 +8,13 @@ import {
   Quaternion,
   Scene,
   MeshBasicMaterial,
+  Vector2,
 } from "three";
+
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
+// import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass';
 
 import {
   createCamera,
@@ -24,15 +30,6 @@ import {
 const containerId = "CanvasFrame";
 const canvasId = "scene";
 
-// import { bottleParams } from "./materials";
-// import { setupGui } from "./gui";
-
-// const arrowHelper = new ArrowHelper(
-//   new Vector3(),
-//   new Vector3(),
-//   0.25,
-//   0xffff00
-// )
 
 import state from "./store";
 
@@ -43,9 +40,9 @@ const word1 = document.getElementById("js-word1");
 const word2 = document.getElementById("js-word2");
 
 const filePath = "/wp-content/themes/eza_theme/3d";
-// const envmapFilename = "studio_country_hall_1k";
 
-const bottleName = container?.dataset.file ?? "finelager";
+let bottleName = container?.dataset.file ?? "finelager";
+bottleName = 'eza_alcoholfree';
 
 const windowScroll = getScrollCallback((currentScroll, previousScroll) => {
   if (state.store) {
@@ -67,62 +64,33 @@ const windowScroll = getScrollCallback((currentScroll, previousScroll) => {
   }
 });
 
-// const { onPointerMove, raycast } = intersectionHelper();
-
-// if (canvas){
-//   canvas.addEventListener("mousemove", onPointerMove);
-// }
-
 const rootObject = new Object3D();
 const bottleObject = new Object3D();
 
-// const intersectionData = {
-//   position: new Vector3(),
-//   normal: new Vector3(),
-//   isIntersecting: false
-// };
+let composer: EffectComposer;
+let renderPass, bloomPass
 
-// const intersectCb = (intersection: Intersection<Object3D<ThreeEvent>> | null) => {
-//   if (intersection){
-//     const n = new Vector3();
-//     const objectNorm = (intersection.face as Face).normal;
-//     n.copy(objectNorm);
-//     intersectionData.normal.copy(objectNorm);
-//     n.transformDirection(intersection.object.matrixWorld)
 
-//     arrowHelper.setDirection(n);
-//     arrowHelper.setColor(0x0000ff);
-//     arrowHelper.setLength(1.3)
-//     const objectPos = bottleObject.worldToLocal(intersection.point);
-//     arrowHelper.position.copy(objectPos);
-//     intersectionData.position.copy(objectPos);
-//     arrowHelper.visible = true;
-//     intersectionData.isIntersecting = true;
-//   } else {
-//     arrowHelper.visible = false;
-//     intersectionData.isIntersecting = false;
-//   }
-// }
 
-function addLights(scene: Scene) {
+function addLights(object: Object3D) {
   const ambientLight = new AmbientLight("#aabbdd", 0.35);
-  scene.add(ambientLight);
+  object.add(ambientLight);
   const backLight = new PointLight(0x99ff66, 10, 40);
   backLight.position.set(65, 0, 20);
-  scene.add(backLight);
+  object.add(backLight);
   const pointLight = new PointLight(0xffff99, 8, 40);
   pointLight.position.set(45, 30, 5);
-  scene.add(pointLight);
+  object.add(pointLight);
   var directionalLight = new DirectionalLight(0xffffff, 1);
   directionalLight.castShadow = true;
   directionalLight.shadow.mapSize.width = 1024; // default
   directionalLight.shadow.mapSize.height = 1024; // default
   directionalLight.shadow.camera.near = 0.5; // default
   directionalLight.shadow.camera.far = 500; // default
-  scene.add(directionalLight);
+  object.add(directionalLight);
 
   const lightTargetObject = new Object3D();
-  scene.add(lightTargetObject);
+  object.add(lightTargetObject);
   directionalLight.target = lightTargetObject;
   directionalLight.position.set(-2000, 1000, -100);
   lightTargetObject.position.set(0, -0, 100);
@@ -136,14 +104,28 @@ export async function init(): Promise<boolean> {
   const domNodes = { canvas, container, word1, word2 };
   const renderer = createRenderer(canvas);
   const camera = createCamera(canvas);
-
-  observeResize(renderer, camera);
-
   const scene = new Scene();
+
+  composer = new EffectComposer(renderer);
+  renderPass = new RenderPass(scene, camera);
+  bloomPass = new UnrealBloomPass(new Vector2(canvas.clientWidth, canvas.clientHeight), 0.5, 0.7, 0.8);
+  bloomPass.renderToScreen = true;
+// 
+  // filmPass = new FilmPass(0.1,0.008, 648);
+  // filmPass.renderToScreen = true;
+
+
+  composer.addPass(renderPass);
+  // composer.addPass(bloomPass);
+  // composer.addPass(filmPass);
+
+  observeResize(renderer, camera, bloomPass);
+
+
 
   scene.add(rootObject);
 
-  addLights(scene);
+  addLights(rootObject);
 
   try {
     await Promise.all([
@@ -168,15 +150,21 @@ export async function init(): Promise<boolean> {
       // const meshes = 
 
       gltf.scene.traverse((child) => {
+        console.log(child.name)
         const mesh = child as Mesh;
         if (mesh.isMesh) {
-          mesh.frustumCulled = false;
+          // mesh.frustumCulled = false;
           (mesh.material as MeshBasicMaterial).envMap = textureCube;
+
           // bottleObject.add(mesh);
         }
       });
 
+
+
       bottleObject.add(...gltf.scene.children)
+
+      console.log(bottleObject)
 
       // scene.add(gltf.scene);
 
@@ -217,7 +205,8 @@ export async function init(): Promise<boolean> {
 export function animate() {
   requestAnimationFrame(animate);
   if (state.store) {
-    state.store.renderer.render(state.store.scene, state.store.camera);
+    composer.render();
+    // state.store.renderer.render(state.store.scene, state.store.camera);
     windowScroll();
   }
 }

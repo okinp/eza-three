@@ -18,7 +18,6 @@ export function createRenderer(canvas: HTMLElement) {
   renderer.outputEncoding = sRGBEncoding;
   renderer.toneMapping = ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.6;
-  renderer.physicallyCorrectLights = true;
   return renderer;
 }
 

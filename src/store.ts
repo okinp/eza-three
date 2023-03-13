@@ -36,15 +36,6 @@ export interface Store {
   scene: Scene;
   renderer: WebGLRenderer;
   camera: PerspectiveCamera;
-  // selectedDropSize: keyof iDropletMeshes,
-  // dropletMeshes: {
-  //   xs: iDropletMesh;
-  //   sm: iDropletMesh;
-  //   md: iDropletMesh;
-  //   xl: iDropletMesh;
-  //   xxl: iDropletMesh;
-  //   xxxl: iDropletMesh;
-  // };
   isReady: boolean;
 }
 

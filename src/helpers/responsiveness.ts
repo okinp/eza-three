@@ -1,7 +1,8 @@
 import { PerspectiveCamera, WebGLRenderer } from "three";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import state from "../store";
 
-export function resizeRendererToDisplaySize(renderer: WebGLRenderer, camera: PerspectiveCamera) {
+export function resizeRendererToDisplaySize(renderer: WebGLRenderer, camera: PerspectiveCamera, bloomPass: UnrealBloomPass) {
   return function () {
     // console.log("resize observer called")
     const canvas = renderer.domElement;
@@ -15,13 +16,14 @@ export function resizeRendererToDisplaySize(renderer: WebGLRenderer, camera: Per
       state.store.bottleObject.scale.set(2,2, 2);
     }
     renderer.setSize(width, height, false);
+    bloomPass.setSize(width,height);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
   }
 };
 
 
-export function observeResize(renderer: WebGLRenderer, camera: PerspectiveCamera) {
-  const resizeObserver = new ResizeObserver(resizeRendererToDisplaySize(renderer, camera));
+export function observeResize(renderer: WebGLRenderer, camera: PerspectiveCamera, bloomPass: UnrealBloomPass) {
+  const resizeObserver = new ResizeObserver(resizeRendererToDisplaySize(renderer, camera, bloomPass));
   resizeObserver.observe(renderer.domElement, { box: 'border-box' });
 }
